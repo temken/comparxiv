@@ -22,10 +22,15 @@ For questions, bug reports or other suggestions please contact [emken@chalmers.s
 
 This project is licensed under the MIT License - see the LICENSE file.
 
+## ACKNOWLEDGEMENTS
+
+I am grateful for [this useful tutorial](https://python-packaging.readthedocs.io/en/latest/index.html) by Scott Torborg about python packaging.
+
 ## TO-DO
 
 - [x]Handle multiple tex files and identify the master file accurately.
-- [ ]Make it a proper, installable executable script, that works from any directory.
+- [x]Make it a proper, installable executable script, that works from any directory.
+- [ ]Progress bar with tqdm.
 - [ ]Option to deactivate the removal of the temp files (ideally with an option flag).
 - [ ]Handle old arxiv numbers.
 - [ ]Publish the first version.
