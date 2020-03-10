@@ -32,11 +32,11 @@ def compare_preprints(arxiv_ID, version_a, version_b):
 
 	#2.3 Run latexdiff on the .bbl files if they are included.
 	
-	# if bbl_file_a != None and bbl_file_b != None:
-	# 	print("\nRun latexdiff on .bbl files:")
-	# 	print("\t",temp_folder_a+bbl_file_a)
-	# 	print("\t",temp_folder_b+bbl_file_b)
-	# 	os.system("latexdiff --append-textcmd=field "+temp_folder_a+bbl_file_a+" "+temp_folder_b+bbl_file_b+">"+temp_folder_b+diff_file+".bbl")
+	if bbl_file_a != None and bbl_file_b != None:
+		print("\nRun latexdiff on .bbl files:")
+		print("\t",temp_folder_a+bbl_file_a)
+		print("\t",temp_folder_b+bbl_file_b)
+		os.system("latexdiff --append-textcmd=field "+temp_folder_a+bbl_file_a+" "+temp_folder_b+bbl_file_b+">"+temp_folder_b+diff_file+".bbl")
 
 	#2.4 Run latexdiff on the tex files
 	print("\nRun latexdiff on .tex files:")
@@ -46,8 +46,8 @@ def compare_preprints(arxiv_ID, version_a, version_b):
 
 	#3. Compile the files to a pdf
 	os.chdir(temp_folder_b)
-	os.system("pdflatex -interaction=nonstopmode -halt-on-error "+diff_file+".tex")
-	os.system("pdflatex -interaction=nonstopmode -halt-on-error "+diff_file+".tex")
+	os.system("pdflatex -quiet -interaction=nonstopmode -halt-on-error "+diff_file+".tex")
+	os.system("pdflatex -quiet -interaction=nonstopmode -halt-on-error "+diff_file+".tex")
 	os.system("mv " + diff_file+".pdf" + " ../" + diff_file+".pdf")
 	os.chdir("..")
 
@@ -60,27 +60,37 @@ def compare_preprints(arxiv_ID, version_a, version_b):
 	#6. Delete temporary files
 	remove_temporary_files(arxiv_ID)
 
+	#7. Open PDF
+	os.system("open "+diff_file+".pdf")
+
 #Download the files from the preprint server, if it hasn't been done before.
+def download_from_url(url, destination):
+    file_size = int(requests.head(url).headers["Content-Length"])
+    if os.path.exists(destination):
+        first_byte = os.path.getsize(destination)
+    else:
+        first_byte = 0
+    if first_byte >= file_size:
+        return file_size
+    header = {"Range": "bytes=%s-%s" % (first_byte, file_size)}
+    pbar = tqdm(
+        total=file_size, initial=first_byte,
+        unit='B', unit_scale=True, desc=url.split('/')[-1])
+    req = requests.get(url, headers=header, stream=True)
+    with(open(destination, 'ab')) as f:
+        for chunk in req.iter_content(chunk_size=1024):
+            if chunk:
+                f.write(chunk)
+                pbar.update(1024)
+    pbar.close()
+    return file_size
+
+
 def download_from_arxiv(version_ID):
 	filepath = "./"+version_ID
 	if os.path.isfile(filepath) == False:
 		url="https://arxiv.org/e-print/"+version_ID
-		with open(filepath, "wb") as f:
-			print("Downloading source files for "+version_ID)
-			response = requests.get(url, stream=True)
-			total_length = response.headers.get('content-length')
-			if total_length is None: # no content length header
-				f.write(response.content)
-			else:
-				dl = 0
-				total_length = int(total_length)
-				for data in response.iter_content(chunk_size=4096):
-					dl += len(data)
-					f.write(data)
-					done = int(50 * dl / total_length)
-					sys.stdout.write("\r[%s%s]" % ('=' * done, ' ' * (50-done)) )    
-					sys.stdout.flush()
-		print("\n")
+		download_from_url(url,filepath)
 	else:
 		print("Download of source files for "+version_ID+" not necessary.")
 

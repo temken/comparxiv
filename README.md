@@ -7,6 +7,8 @@ Script to compare two version of an arXiv preprint.
 
 ## DEPENDENCIES
 
+- tqdm
+
 ## VERSIONS
 
 - **v1.0** (xx/xx/2020): First version released.
@@ -30,8 +32,9 @@ I am grateful for [this useful tutorial](https://python-packaging.readthedocs.io
 
 - [x]Handle multiple tex files and identify the master file accurately.
 - [x]Make it a proper, installable executable script, that works from any directory.
-- [ ]Progress bar with tqdm.
+- [X]Progress bar with tqdm.
 - [ ]Option to deactivate the removal of the temp files (ideally with an option flag).
+- [ ]Reduce the amount of pdflatex/difflatex terminal output.
 - [ ]Handle old arxiv numbers.
 - [ ]Publish the first version.
 - [ ]Compare references, identify removed/added references.
