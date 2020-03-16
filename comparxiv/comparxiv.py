@@ -8,7 +8,6 @@ from tqdm import tqdm
 
 
 def compare_preprints(arxiv_ID, version_a, version_b):
-	print_title(arxiv_ID,version_a,version_b)
 	ID_a = arxiv_ID+"v"+str(version_a)
 	ID_b = arxiv_ID+"v"+str(version_b)
 	temp_folder_a = './.comparXiv_temp_'+ID_a+'/'
@@ -46,8 +45,8 @@ def compare_preprints(arxiv_ID, version_a, version_b):
 
 	#3. Compile the files to a pdf
 	os.chdir(temp_folder_b)
-	os.system("pdflatex -quiet -interaction=nonstopmode -halt-on-error "+diff_file+".tex")
-	os.system("pdflatex -quiet -interaction=nonstopmode -halt-on-error "+diff_file+".tex")
+	os.system("pdflatex -interaction=nonstopmode -halt-on-error "+diff_file+".tex")
+	os.system("pdflatex -interaction=nonstopmode -halt-on-error "+diff_file+".tex")
 	os.system("mv " + diff_file+".pdf" + " ../" + diff_file+".pdf")
 	os.chdir("..")
 
@@ -65,25 +64,25 @@ def compare_preprints(arxiv_ID, version_a, version_b):
 
 #Download the files from the preprint server, if it hasn't been done before.
 def download_from_url(url, destination):
-    file_size = int(requests.head(url).headers["Content-Length"])
-    if os.path.exists(destination):
-        first_byte = os.path.getsize(destination)
-    else:
-        first_byte = 0
-    if first_byte >= file_size:
-        return file_size
-    header = {"Range": "bytes=%s-%s" % (first_byte, file_size)}
-    pbar = tqdm(
-        total=file_size, initial=first_byte,
-        unit='B', unit_scale=True, desc=url.split('/')[-1])
-    req = requests.get(url, headers=header, stream=True)
-    with(open(destination, 'ab')) as f:
-        for chunk in req.iter_content(chunk_size=1024):
-            if chunk:
-                f.write(chunk)
-                pbar.update(1024)
-    pbar.close()
-    return file_size
+	file_size = int(requests.head(url).headers["Content-Length"])
+	if os.path.exists(destination):
+		first_byte = os.path.getsize(destination)
+	else:
+		first_byte = 0
+	if first_byte >= file_size:
+		return file_size
+	header = {"Range": "bytes=%s-%s" % (first_byte, file_size)}
+	pbar = tqdm(
+		total=file_size, initial=first_byte,
+		unit='B', unit_scale=True, desc=url.split('/')[-1])
+	req = requests.get(url, headers=header, stream=True)
+	with(open(destination, 'ab')) as f:
+		for chunk in req.iter_content(chunk_size=1024):
+			if chunk:
+				f.write(chunk)
+				pbar.update(1024)
+	pbar.close()
+	return file_size
 
 
 def download_from_arxiv(version_ID):

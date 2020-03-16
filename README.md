@@ -32,7 +32,8 @@ I am grateful for [this useful tutorial](https://python-packaging.readthedocs.io
 
 - [x]Handle multiple tex files and identify the master file accurately.
 - [x]Make it a proper, installable executable script, that works from any directory.
-- [X]Progress bar with tqdm.
+- [x]Progress bar with tqdm.
+- [ ]Handle the inline arguments properly, especially when they are invalid.
 - [ ]Option to deactivate the removal of the temp files (ideally with an option flag).
 - [ ]Reduce the amount of pdflatex/difflatex terminal output.
 - [ ]Handle old arxiv numbers.
