@@ -2,11 +2,27 @@
 Script to compare two version of an arXiv preprint.
 
 ## INSTALLATION
+You can install *comparxiv* via
+```
+pip install comparxiv
+```
 
 ## USAGE
+To compare v1 and v2 of a paper with *comparxiv*, run e.g.
+```
+comparxiv 1905.06348 1 2
+```
+
+After a successful run, you should find a latexdiff-generated PDF file in your folder.
+
+For more details, simply run
+```
+comparxiv --help
+```
 
 ## DEPENDENCIES
 
+- argparse
 - tqdm
 
 ## VERSIONS
@@ -33,8 +49,8 @@ I am grateful for [this useful tutorial](https://python-packaging.readthedocs.io
 - [x]Handle multiple tex files and identify the master file accurately.
 - [x]Make it a proper, installable executable script, that works from any directory.
 - [x]Progress bar with tqdm.
-- [ ]Handle the inline arguments properly, especially when they are invalid.
-- [ ]Option to deactivate the removal of the temp files (ideally with an option flag).
+- [x]Handle the inline arguments properly, especially when they are invalid.
+- [x]Option to deactivate the removal of the temp files (ideally with an option flag).
 - [ ]Reduce the amount of pdflatex/difflatex terminal output.
 - [ ]Handle old arxiv numbers.
 - [ ]Publish the first version.

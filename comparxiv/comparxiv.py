@@ -6,8 +6,11 @@ import requests
 
 from tqdm import tqdm
 
+version = '1.0'
+author = 'Timon Emken'
+year = '2020'
 
-def compare_preprints(arxiv_ID, version_a, version_b):
+def compare_preprints(arxiv_ID, version_a, version_b,keep_temp):
 	ID_a = arxiv_ID+"v"+str(version_a)
 	ID_b = arxiv_ID+"v"+str(version_b)
 	temp_folder_a = './.comparXiv_temp_'+ID_a+'/'
@@ -57,7 +60,8 @@ def compare_preprints(arxiv_ID, version_a, version_b):
 	#5. Compare figures
 
 	#6. Delete temporary files
-	remove_temporary_files(arxiv_ID)
+	if keep_temp == False:
+		remove_temporary_files(arxiv_ID)
 
 	#7. Open PDF
 	os.system("open "+diff_file+".pdf")
@@ -153,8 +157,8 @@ def remove_temporary_files(arxiv_ID):
 def print_title(ID,v1,v2):
 	asci_title = "                                    __  ___       \n  ___ ___  _ __ ___  _ __   __ _ _ _\ \/ (_)_   __\n / __/ _ \| '_ ` _ \| '_ \ / _` | '__\  /| \ \ / /\n| (_| (_) | | | | | | |_) | (_| | |  /  \| |\ V / \n \___\___/|_| |_| |_| .__/ \__,_|_| /_/\_\_| \_/  \n                    |_|                           \n"
 	print(asci_title)
-	print("by Timon Emken (2020)")
-	print("Compare [arXiv:"+ID+"]: v"+v1+" vs v"+v2,"\n")
+	print("Version ",version,", developed by",author,"(",year,")")
+	print("Compare [arXiv:"+ID+"]: v"+str(v1)+" vs v"+str(v2),"\n")
 
 if __name__ == "__main__":
 	arxiv_ID = str(sys.argv[1])
