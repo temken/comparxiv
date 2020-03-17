@@ -19,15 +19,22 @@ To compare v1 and v2 of a paper with *comparxiv*, run e.g.
 comparxiv 1905.06348 1 2
 ```
 
+or simply
+
+```
+comparxiv hep-ph/0612370
+```
+
 After a successful run, you should find a latexdiff-generated PDF file in your folder.
 
-For more details, simply run
+For more details about e.g. default arguments and options, simply run
 ```
 comparxiv --help
 ```
 
 ## DEPENDENCIES
 
+- latexdiff
 - argparse
 - tqdm
 
@@ -57,11 +64,9 @@ I am grateful for [this useful tutorial](https://python-packaging.readthedocs.io
 - [x]Progress bar with tqdm.
 - [x]Handle the inline arguments properly, especially when they are invalid.
 - [x]Option to deactivate the removal of the temp files (ideally with an option flag).
-- [ ]Reduce the amount of pdflatex/difflatex terminal output.
-- [ ]Handle old arxiv numbers.
+- [x]Reduce the amount of pdflatex/latexdiff terminal output.
+- [x]Handle old arxiv numbers.
 - [ ]Set up tests.
 - [ ]Publish the first version.
 - [ ]Compare references, identify removed/added references.
 - [ ]Compare figures, identify removed/added figures.
-- [ ]Extract tex comments and their changes.
-- [ ]?

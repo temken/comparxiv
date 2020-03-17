@@ -11,17 +11,24 @@ author = 'Timon Emken'
 year = '2020'
 
 def compare_preprints(arxiv_ID, version_a, version_b,keep_temp,show_latex_output,dont_open_pdf):
-	ID_a = arxiv_ID+"v"+str(version_a)
-	ID_b = arxiv_ID+"v"+str(version_b)
+
+	#Check if old or new arxiv ID
+	if "/" in arxiv_ID:
+		ID_a = os.path.split(arxiv_ID)[-1]+"v"+str(version_a)
+		ID_b = os.path.split(arxiv_ID)[-1]+"v"+str(version_b)
+	else:
+		ID_a = arxiv_ID+"v"+str(version_a)
+		ID_b = arxiv_ID+"v"+str(version_b)
+
 	temp_folder_a = './.temp_'+ID_a+'/'
 	temp_folder_b = './.temp_'+ID_b+'/'
-	diff_file = arxiv_ID+"_v"+str(version_a)+"v"+str(version_b)
+	diff_file = os.path.split(arxiv_ID)[-1]+"_v"+str(version_a)+"v"+str(version_b)
 
-	#1. Download and unpack files
-	download_from_arxiv(ID_a)
-	unpack_source_files(ID_a)
-	download_from_arxiv(ID_b)
-	unpack_source_files(ID_b)
+	# #1. Download and unpack files
+	download_from_arxiv(arxiv_ID,version_a)
+	download_from_arxiv(arxiv_ID,version_b)
+	unpack_source_files(arxiv_ID,version_a,temp_folder_a)
+	unpack_source_files(arxiv_ID,version_b,temp_folder_b)
 
 	#2. Run latexdiff
 	#2.1 Identify the master tex files
@@ -32,7 +39,7 @@ def compare_preprints(arxiv_ID, version_a, version_b,keep_temp,show_latex_output
 	bbl_file_a = identify_bbl_file(temp_folder_a,arxiv_ID)
 	bbl_file_b = identify_bbl_file(temp_folder_b,arxiv_ID)
 
-	#2.3 Run latexdiff on the .bbl files if they are included.
+	# #2.3 Run latexdiff on the .bbl files if they are included.
 	
 	# if bbl_file_a != None and bbl_file_b != None:
 	# 	print("\nRun latexdiff on .bbl files:")
@@ -47,25 +54,23 @@ def compare_preprints(arxiv_ID, version_a, version_b,keep_temp,show_latex_output
 	print("\nRun latexdiff on .tex files:")
 	print("\t",temp_folder_a+master_file_a)
 	print("\t",temp_folder_b+master_file_b)
-	os.system("latexdiff "+temp_folder_a+master_file_a+" "+temp_folder_b+master_file_b+">"+temp_folder_b+diff_file+".tex")
+	if show_latex_output == False:
+		latexdiff_command = "latexdiff --ignore-warnings "+temp_folder_a+master_file_a+" "+temp_folder_b+master_file_b+">"+temp_folder_b+diff_file+".tex"
+	else:
+		latexdiff_command = "latexdiff "+temp_folder_a+master_file_a+" "+temp_folder_b+master_file_b+">"+temp_folder_b+diff_file+".tex"
+	os.system(latexdiff_command)
 
 	#3. Compile the files to a pdf
-	print("\nCompile .tex file via pdflatex via")
 	os.chdir(temp_folder_b)
 	pdflatex_command = "pdflatex -interaction=nonstopmode "+diff_file+".tex"
 	if show_latex_output == False:
 		pdflatex_command += " 2>&1 > /dev/null"
+	print("\nCompile .tex file via")
 	print("\t",pdflatex_command)
 	os.system(pdflatex_command)
 	os.system(pdflatex_command)
 	os.system("mv " + diff_file+".pdf" + " ../" + diff_file+".pdf")
 	os.chdir("..")
-
-	# os.chdir(temp_folder_b)
-	# os.system("pdflatex -interaction=nonstopmode -halt-on-error "+diff_file+".tex")
-	# os.system("pdflatex -interaction=nonstopmode -halt-on-error "+diff_file+".tex")
-	# os.system("mv " + diff_file+".pdf" + " ../" + diff_file+".pdf")
-	# os.chdir("..")
 
 	#3. Compare references.
 
@@ -109,29 +114,40 @@ def download_from_url(url, destination):
 	return file_size
 
 
-def download_from_arxiv(version_ID):
-	filepath = "./"+version_ID
+def download_from_arxiv(arxiv_ID,version):
+	#Check if old or new arxiv ID
+	if "/" in arxiv_ID:
+		filepath = "./"+os.path.split(arxiv_ID)[-1]+"v"+str(version)
+		
+	else:
+		filepath = "./"+arxiv_ID+"v"+str(version)
+
 	if os.path.isfile(filepath) == False:
-		url="https://arxiv.org/e-print/"+version_ID
+		url="https://arxiv.org/e-print/"+arxiv_ID+"v"+str(version)
 		download_from_url(url,filepath)
 	else:
-		print("Download of source files for "+version_ID+" not necessary.")
+		print("Download of source files for "+arxiv_ID+"v"+str(version)+" not necessary.")
 
 #Unpack the archived files to a temporary folder
-def unpack_source_files(version_ID):
-	path_source = "./"+version_ID
+def unpack_source_files(arxiv_ID,version,path_destination):
+	version_ID = arxiv_ID+"v"+str(version)
+	#Check if old or new arxiv ID
+	if "/" in arxiv_ID:
+		path_source = "./"+os.path.split(version_ID)[-1]
+	else:
+		path_source = "./"+version_ID
+
 	# Create folder for temporary files
-	path_destination = './.temp_'+version_ID+'/'
 	print("Unpack source files of",version_ID,"to",path_destination,"\n")
 	if os.path.isfile(path_source) and os.path.exists(path_destination) == False:
 		os.mkdir(path_destination)
 	# Unpack files
-	os.system('tar -xzf '+version_ID +' -C '+ path_destination)
+	os.system('tar -xzf '+path_source +' -C '+ path_destination)
 
 def identify_master_tex_file(path,arxiv_ID):
 	tex_files = []
 	for file in os.listdir(path):
-		if file.endswith(".tex") and file.startswith(arxiv_ID) == False:
+		if file.endswith(".tex") and (file.startswith(arxiv_ID) or file.startswith(os.path.split(arxiv_ID)[-1]))== False:
 			tex_files.append(file)
 	if len(tex_files) == 1:
 		master_file = tex_files[0]
@@ -151,17 +167,12 @@ def identify_bbl_file(path, arxiv_ID):
 	for file in os.listdir(path):
 		if file.endswith('.bbl') and not file.startswith(arxiv_ID):
 			bbl_file = file
+			print("Bibliography (.bbl) file in",path,":\t",bbl_file)
 			break
 	# Possibility b: No .bbl file exists.
 	else:
 		bbl_file = None
-		# tex_file = identify_master_tex_file(path,arxiv_ID)
-		# os.chdir(path)
-		# os.system("pdflatex -interaction=batchmode "+tex_file)
-		# os.system("bibtex " + os.path.splitext(tex_file)[0])
-		# os.chdir("..")
-		# bbl_file = os.path.splitext(tex_file)[0]+".bbl"
-	print("Bibliography file in",path,":\t",bbl_file)
+		print("No .bbl file found in\t",path)
 	return bbl_file
 
 def remove_temporary_files(arxiv_ID):
