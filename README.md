@@ -7,6 +7,12 @@ You can install *comparxiv* via
 pip install comparxiv
 ```
 
+or direct from source
+
+```
+python setup.py install
+```
+
 ## USAGE
 To compare v1 and v2 of a paper with *comparxiv*, run e.g.
 ```
@@ -53,6 +59,7 @@ I am grateful for [this useful tutorial](https://python-packaging.readthedocs.io
 - [x]Option to deactivate the removal of the temp files (ideally with an option flag).
 - [ ]Reduce the amount of pdflatex/difflatex terminal output.
 - [ ]Handle old arxiv numbers.
+- [ ]Set up tests.
 - [ ]Publish the first version.
 - [ ]Compare references, identify removed/added references.
 - [ ]Compare figures, identify removed/added figures.

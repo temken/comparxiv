@@ -10,7 +10,7 @@ version = '1.0'
 author = 'Timon Emken'
 year = '2020'
 
-def compare_preprints(arxiv_ID, version_a, version_b,keep_temp):
+def compare_preprints(arxiv_ID, version_a, version_b,keep_temp,show_latex_output,dont_open_pdf):
 	ID_a = arxiv_ID+"v"+str(version_a)
 	ID_b = arxiv_ID+"v"+str(version_b)
 	temp_folder_a = './.comparXiv_temp_'+ID_a+'/'
@@ -34,11 +34,14 @@ def compare_preprints(arxiv_ID, version_a, version_b,keep_temp):
 
 	#2.3 Run latexdiff on the .bbl files if they are included.
 	
-	if bbl_file_a != None and bbl_file_b != None:
-		print("\nRun latexdiff on .bbl files:")
-		print("\t",temp_folder_a+bbl_file_a)
-		print("\t",temp_folder_b+bbl_file_b)
-		os.system("latexdiff --append-textcmd=field "+temp_folder_a+bbl_file_a+" "+temp_folder_b+bbl_file_b+">"+temp_folder_b+diff_file+".bbl")
+	# if bbl_file_a != None and bbl_file_b != None:
+	# 	print("\nRun latexdiff on .bbl files:")
+	# 	print("\t",temp_folder_a+bbl_file_a)
+	# 	print("\t",temp_folder_b+bbl_file_b)
+	# 	os.system("latexdiff --append-textcmd=field "+temp_folder_a+bbl_file_a+" "+temp_folder_b+bbl_file_b+">"+temp_folder_b+diff_file+".bbl")
+
+	if bbl_file_b!= None:
+		os.system("cp "+ temp_folder_b + bbl_file_b + " " +temp_folder_b+diff_file+".bbl")
 
 	#2.4 Run latexdiff on the tex files
 	print("\nRun latexdiff on .tex files:")
@@ -47,11 +50,22 @@ def compare_preprints(arxiv_ID, version_a, version_b,keep_temp):
 	os.system("latexdiff "+temp_folder_a+master_file_a+" "+temp_folder_b+master_file_b+">"+temp_folder_b+diff_file+".tex")
 
 	#3. Compile the files to a pdf
+	print("\nCompile .tex file via pdflatex via")
 	os.chdir(temp_folder_b)
-	os.system("pdflatex -interaction=nonstopmode -halt-on-error "+diff_file+".tex")
-	os.system("pdflatex -interaction=nonstopmode -halt-on-error "+diff_file+".tex")
+	pdflatex_command = "pdflatex -interaction=nonstopmode "+diff_file+".tex"
+	if show_latex_output == False:
+		pdflatex_command += " 2>&1 > /dev/null"
+	print("\t",pdflatex_command)
+	os.system(pdflatex_command)
+	os.system(pdflatex_command)
 	os.system("mv " + diff_file+".pdf" + " ../" + diff_file+".pdf")
 	os.chdir("..")
+
+	# os.chdir(temp_folder_b)
+	# os.system("pdflatex -interaction=nonstopmode -halt-on-error "+diff_file+".tex")
+	# os.system("pdflatex -interaction=nonstopmode -halt-on-error "+diff_file+".tex")
+	# os.system("mv " + diff_file+".pdf" + " ../" + diff_file+".pdf")
+	# os.chdir("..")
 
 	#3. Compare references.
 
@@ -64,7 +78,11 @@ def compare_preprints(arxiv_ID, version_a, version_b,keep_temp):
 		remove_temporary_files(arxiv_ID)
 
 	#7. Open PDF
-	os.system("open "+diff_file+".pdf")
+	if dont_open_pdf == False:
+		print("\nOpen the pdf.")
+		os.system("open "+diff_file+".pdf")
+
+	print("\nFinished.")
 
 #Download the files from the preprint server, if it hasn't been done before.
 def download_from_url(url, destination):
@@ -157,7 +175,7 @@ def remove_temporary_files(arxiv_ID):
 def print_title(ID,v1,v2):
 	asci_title = "                                    __  ___       \n  ___ ___  _ __ ___  _ __   __ _ _ _\ \/ (_)_   __\n / __/ _ \| '_ ` _ \| '_ \ / _` | '__\  /| \ \ / /\n| (_| (_) | | | | | | |_) | (_| | |  /  \| |\ V / \n \___\___/|_| |_| |_| .__/ \__,_|_| /_/\_\_| \_/  \n                    |_|                           \n"
 	print(asci_title)
-	print("Version ",version,", developed by",author,"(",year,")")
+	print("Version ",version,", developed by",author,"("+year+")")
 	print("Compare [arXiv:"+ID+"]: v"+str(v1)+" vs v"+str(v2),"\n")
 
 if __name__ == "__main__":
