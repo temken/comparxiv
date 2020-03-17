@@ -51,7 +51,7 @@ def compare_preprints(arxiv_ID, version_a, version_b,keep_temp,show_latex_output
 		os.system("cp "+ temp_folder_b + bbl_file_b + " " +temp_folder_b+diff_file+".bbl")
 
 	#2.4 Run latexdiff on the tex files
-	print("\nRun latexdiff on .tex files:")
+	print("Run latexdiff on .tex files:")
 	print("\t",temp_folder_a+master_file_a)
 	print("\t",temp_folder_b+master_file_b)
 	if show_latex_output == False:
@@ -65,8 +65,8 @@ def compare_preprints(arxiv_ID, version_a, version_b,keep_temp,show_latex_output
 	pdflatex_command = "pdflatex -interaction=nonstopmode "+diff_file+".tex"
 	if show_latex_output == False:
 		pdflatex_command += " 2>&1 > /dev/null"
-	print("\nCompile .tex file via")
-	print("\t",pdflatex_command)
+	print("Compile .tex file via")
+	print("\t",pdflatex_command,"\n")
 	os.system(pdflatex_command)
 	os.system(pdflatex_command)
 	os.system("mv " + diff_file+".pdf" + " ../" + diff_file+".pdf")
@@ -84,10 +84,11 @@ def compare_preprints(arxiv_ID, version_a, version_b,keep_temp,show_latex_output
 
 	#7. Open PDF
 	if os.path.isfile(diff_file+".pdf"):
-		if dont_open_pdf == False:
-			print("\nOpen the pdf.")
-			os.system("open "+diff_file+".pdf")
 		print("\nFinished: success.")
+		if dont_open_pdf == False:
+			print("\tOpen the pdf.")
+			os.system("open "+diff_file+".pdf")
+		
 	else:
 		print("\nFinished: failure.\n\tNo pdf file could be generated.")
 
@@ -138,7 +139,7 @@ def unpack_source_files(arxiv_ID,version,path_destination):
 		path_source = "./"+version_ID
 
 	# Create folder for temporary files
-	print("Unpack source files of",version_ID,"to",path_destination,"\n")
+	print("Unpack source files of",version_ID,"to",path_destination,".")
 	if os.path.isfile(path_source) and os.path.exists(path_destination) == False:
 		os.mkdir(path_destination)
 	# Unpack files
@@ -186,7 +187,7 @@ def print_title(ID,v1,v2):
 	asci_title = "                                    __  ___       \n  ___ ___  _ __ ___  _ __   __ _ _ _\ \/ (_)_   __\n / __/ _ \| '_ ` _ \| '_ \ / _` | '__\  /| \ \ / /\n| (_| (_) | | | | | | |_) | (_| | |  /  \| |\ V / \n \___\___/|_| |_| |_| .__/ \__,_|_| /_/\_\_| \_/  \n                    |_|                           \n"
 	print(asci_title)
 	print("Version ",version,", developed by",author,"("+year+")")
-	print("Compare [arXiv:"+ID+"]: v"+str(v1)+" vs v"+str(v2),"\n")
+	print("\nCompare [arXiv:"+ID+"]: v"+str(v1)+" vs v"+str(v2),"\n")
 
 if __name__ == "__main__":
 	arxiv_ID = str(sys.argv[1])
