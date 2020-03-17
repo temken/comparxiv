@@ -13,8 +13,8 @@ year = '2020'
 def compare_preprints(arxiv_ID, version_a, version_b,keep_temp,show_latex_output,dont_open_pdf):
 	ID_a = arxiv_ID+"v"+str(version_a)
 	ID_b = arxiv_ID+"v"+str(version_b)
-	temp_folder_a = './.comparXiv_temp_'+ID_a+'/'
-	temp_folder_b = './.comparXiv_temp_'+ID_b+'/'
+	temp_folder_a = './.temp_'+ID_a+'/'
+	temp_folder_b = './.temp_'+ID_b+'/'
 	diff_file = arxiv_ID+"_v"+str(version_a)+"v"+str(version_b)
 
 	#1. Download and unpack files
@@ -78,11 +78,13 @@ def compare_preprints(arxiv_ID, version_a, version_b,keep_temp,show_latex_output
 		remove_temporary_files(arxiv_ID)
 
 	#7. Open PDF
-	if dont_open_pdf == False:
-		print("\nOpen the pdf.")
-		os.system("open "+diff_file+".pdf")
-
-	print("\nFinished.")
+	if os.path.isfile(diff_file+".pdf"):
+		if dont_open_pdf == False:
+			print("\nOpen the pdf.")
+			os.system("open "+diff_file+".pdf")
+		print("\nFinished: success.")
+	else:
+		print("\nFinished: failure.\n\tNo pdf file could be generated.")
 
 #Download the files from the preprint server, if it hasn't been done before.
 def download_from_url(url, destination):
@@ -119,7 +121,7 @@ def download_from_arxiv(version_ID):
 def unpack_source_files(version_ID):
 	path_source = "./"+version_ID
 	# Create folder for temporary files
-	path_destination = './.comparXiv_temp_'+version_ID+'/'
+	path_destination = './.temp_'+version_ID+'/'
 	print("Unpack source files of",version_ID,"to",path_destination,"\n")
 	if os.path.isfile(path_source) and os.path.exists(path_destination) == False:
 		os.mkdir(path_destination)
@@ -127,8 +129,6 @@ def unpack_source_files(version_ID):
 	os.system('tar -xzf '+version_ID +' -C '+ path_destination)
 
 def identify_master_tex_file(path,arxiv_ID):
-	# full_ID = ID+'v'+str(version)
-	# path = './.temp_'+full_ID+'/'
 	tex_files = []
 	for file in os.listdir(path):
 		if file.endswith(".tex") and file.startswith(arxiv_ID) == False:
@@ -144,7 +144,6 @@ def identify_master_tex_file(path,arxiv_ID):
 		else:
 			print("Error in identify_master_tex_file(): Among the ",len(tex_files)," tex files, no master file could be identified.")
 			os.abort()
-	# print("Master tex file in",path,":\t",master_file)
 	return master_file
 
 def identify_bbl_file(path, arxiv_ID):
@@ -168,7 +167,7 @@ def identify_bbl_file(path, arxiv_ID):
 def remove_temporary_files(arxiv_ID):
 	print("Delete temporary files:")
 	for file in os.listdir("."):
-		if file.startswith(".comparXiv_temp_"+arxiv_ID) or (file.startswith(arxiv_ID) and not file.endswith("pdf")):
+		if file.startswith(".temp_"+arxiv_ID) or (file.startswith(arxiv_ID) and not file.endswith("pdf")):
 			print("\t",file)
 			os.system("rm -r "+ file)
 
