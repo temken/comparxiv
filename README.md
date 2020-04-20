@@ -1,8 +1,16 @@
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+
 # comparXiv 
 A wrapper of [**latexdiff**](https://ctan.org/pkg/latexdiff?lang=en) to compare two version of an [arXiv](https://arxiv.org) preprint with a single command.
 
+> This is a beta version. Despite extensive testing, it does not work for all preprints on arXiv. (Especially older preprints can be problematic.)
 
-> This is a beta version. Despite extensive testing, it does not work for all preprints on arXiv. Especially older preprints can be problematic.
+## BUILD AND COVERAGE STATUS
+
+| Branch      | Build status |  Code coverage |
+| ----------- | ----------- |----------- |
+| master      | [![Build Status](https://travis-ci.com/temken/comparXiv.svg?token=CWyAeZfiHMD8t4eitDid&branch=master)](https://travis-ci.com/temken/comparXiv)      |		|
+| dev   | [![Build Status](https://travis-ci.com/temken/comparXiv.svg?token=CWyAeZfiHMD8t4eitDid&branch=dev)](https://travis-ci.com/temken/comparXiv)        |			|
 
 ## INSTALLATION
 You can install *comparxiv* via
@@ -37,10 +45,11 @@ comparxiv --help
 
 ## DEPENDENCIES
 
-- tex distribution
-- latexdiff
-- argparse
-- tqdm
+- a tex distribution with pdflatex and latexdiff
+- argparse (*)
+- tqdm (*)
+
+> (*) Get installed automatically via pip, if necessary.
 
 ## VERSIONS
 

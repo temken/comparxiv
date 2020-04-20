@@ -1,0 +1,46 @@
+sudo: required
+
+language:
+  - python
+
+os:
+  - linux
+  - osx
+
+python:
+  # - 3.5
+  # - 3.6
+  # - 3.7
+  - 3.8
+
+before_install:
+  - if [ $TRAVIS_OS_NAME = linux ]; then sudo apt-get install -y --no-install-recommends texlive-full; fi
+  - 
+  # - brew cask install mactex
+
+addons:
+  apt:
+    # packages:
+    #   - texlive-full
+    update: true
+  homebrew:
+    casks:
+    - mactex-no-gui
+    # update: true
+
+install:
+  - pip install pytest pytest-cov python-coveralls
+
+  - pip install .
+
+cache: pip
+
+script:
+  - pytest --cov=comparxiv comparxiv/tests
+
+after_success:
+  - coveralls
+
+notifications:
+  email: false
+
