@@ -6,7 +6,7 @@ import requests
 
 from tqdm import tqdm
 
-version = '0.1'
+version = '0.1.0'
 author = 'Timon Emken'
 year = '2020'
 
@@ -30,64 +30,73 @@ def compare_preprints(arxiv_ID, version_a, version_b,keep_temp,show_latex_output
 	unpack_source_files(arxiv_ID,version_a,temp_folder_a)
 	unpack_source_files(arxiv_ID,version_b,temp_folder_b)
 
-	#2. Run latexdiff
-	#2.1 Identify the master tex files
+	#2. Identify the .tex and .bbl files.
+	#2.1 tex files
 	master_file_a = identify_master_tex_file(temp_folder_a,arxiv_ID)
 	master_file_b = identify_master_tex_file(temp_folder_b,arxiv_ID)
-
-	#2.2 Identify or create a bbl file.
+	#2.2 bbl files
 	bbl_file_a = identify_bbl_file(temp_folder_a,arxiv_ID)
 	bbl_file_b = identify_bbl_file(temp_folder_b,arxiv_ID)
 
-	# #2.3 Run latexdiff on the .bbl files if they are included.
-	
-	# if bbl_file_a != None and bbl_file_b != None:
-	# 	print("\nRun latexdiff on .bbl files:")
-	# 	print("\t",temp_folder_a+bbl_file_a)
-	# 	print("\t",temp_folder_b+bbl_file_b)
-	# 	os.system("latexdiff --append-textcmd=field "+temp_folder_a+bbl_file_a+" "+temp_folder_b+bbl_file_b+">"+temp_folder_b+diff_file+".bbl")
-
-	if bbl_file_b != None:
-		os.system("cp "+ temp_folder_b + bbl_file_b + " " +temp_folder_b+diff_file+".bbl")
-
-	#2.4 Run latexdiff on the tex files
+	#3. Latexdiff
+	#3.1 tex files 
 	print("Run latexdiff on .tex files:")
 	print("\t",temp_folder_a+master_file_a)
 	print("\t",temp_folder_b+master_file_b)
 	if show_latex_output == False:
-		latexdiff_command = "latexdiff --ignore-warnings "+temp_folder_a+master_file_a+" "+temp_folder_b+master_file_b+">"+temp_folder_b+diff_file+".tex"
+		latexdiff_command_tex = "latexdiff --ignore-warnings "+temp_folder_a+master_file_a+" "+temp_folder_b+master_file_b+">"+temp_folder_b+diff_file+".tex"
 	else:
-		latexdiff_command = "latexdiff "+temp_folder_a+master_file_a+" "+temp_folder_b+master_file_b+">"+temp_folder_b+diff_file+".tex"
-	os.system(latexdiff_command)
+		latexdiff_command_tex = "latexdiff "+temp_folder_a+master_file_a+" "+temp_folder_b+master_file_b+">"+temp_folder_b+diff_file+".tex"
+	os.system(latexdiff_command_tex)
 
-	#3. Compile the files to a pdf
-	os.chdir(temp_folder_b)
-	pdflatex_command = "pdflatex -interaction=nonstopmode "+diff_file+".tex"
+	#3.2 Try to run latexdiff on bbl.
+	if bbl_file_a != None and bbl_file_b != None:
+		print("\nRun latexdiff on .bbl files:")
+		print("\t",temp_folder_a+bbl_file_a)
+		print("\t",temp_folder_b+bbl_file_b)
+		if show_latex_output == False:
+			latexdiff_command_bbl = "latexdiff --ignore-warnings "+temp_folder_a+bbl_file_a+" "+temp_folder_b+bbl_file_b+">"+temp_folder_b+diff_file+".bbl"
+		else:
+			latexdiff_command_bbl = "latexdiff "+temp_folder_a+bbl_file_a+" "+temp_folder_b+bbl_file_b+">"+temp_folder_b+diff_file+".bbl"
+		os.system(latexdiff_command_bbl)
+
+	#4. Run pdflatex
+	Generate_PDF(diff_file,temp_folder_b,show_latex_output)
+
+	#5. If unsuccessful, try again with a copy of the version b .bbl file.
+	if bbl_file_b != None and os.path.isfile(temp_folder_b+diff_file+".pdf") == False:
+		print("\nCopy the .bbl file of version b.")
+		os.system("cp "+ temp_folder_b + bbl_file_b + " " + temp_folder_b + diff_file+".bbl")
+		Generate_PDF(diff_file,temp_folder_b,show_latex_output)
+	
+
+	#6. Compare figures
+	# todo
+
+	#7. If successful copy the .pdf.
+	if os.path.isfile(temp_folder_b+diff_file+".pdf"):
+		os.system("mv " +temp_folder_b+diff_file+".pdf" + " ./" + diff_file+".pdf")
+		print("\nFinished: success.")
+		if dont_open_pdf == False:
+			os.system("open "+diff_file+".pdf")
+	else:
+		print("\nFinished: failure. No pdf file could be generated.")
+	
+	#8. Delete temporary files
+	if keep_temp == False:
+		remove_temporary_files(arxiv_ID)
+
+def Generate_PDF(file, folder, show_latex_output):
+	os.chdir(folder)
+	pdflatex_command = "pdflatex -interaction=nonstopmode "+file+".tex"
 	if show_latex_output == False:
 		pdflatex_command += " 2>&1 > /dev/null"
 	print("Compile .tex file via")
 	print("\t",pdflatex_command,"\n")
 	os.system(pdflatex_command)
 	os.system(pdflatex_command)
-	os.system("mv " + diff_file+".pdf" + " ../" + diff_file+".pdf")
 	os.chdir("..")
 
-	#3. Compare figures
-	# todo
-
-	#4. Delete temporary files
-	if keep_temp == False:
-		remove_temporary_files(arxiv_ID)
-
-	#5. Open PDF
-	if os.path.isfile(diff_file+".pdf"):
-		print("\nFinished: success.")
-		if dont_open_pdf == False:
-			print("\tOpen the pdf.")
-			os.system("open "+diff_file+".pdf")
-	#  use xdg-open	on linux
-	else:
-		print("\nFinished: failure.\n\tNo pdf file could be generated.")
 
 #Download the files from the preprint server, if it hasn't been done before.
 def download_from_url(url, destination):

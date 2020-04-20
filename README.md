@@ -37,6 +37,7 @@ comparxiv --help
 
 ## DEPENDENCIES
 
+- tex distribution
 - latexdiff
 - argparse
 - tqdm
