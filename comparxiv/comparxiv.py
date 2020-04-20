@@ -70,12 +70,14 @@ def compare_preprints(arxiv_ID, version_a, version_b,keep_temp,show_latex_output
 		os.system("cp "+ temp_folder_b + bbl_file_b + " " + temp_folder_b + diff_file+".bbl")
 		Generate_PDF(diff_file,temp_folder_b,show_latex_output)
 	
-
+	success = False;
+	if os.path.isfile(temp_folder_b+diff_file+".pdf"):
+		success = True
 	#6. Compare figures
 	# todo
 
 	#7. If successful copy the .pdf.
-	if os.path.isfile(temp_folder_b+diff_file+".pdf"):
+	if success:
 		os.system("mv " +temp_folder_b+diff_file+".pdf" + " ./" + diff_file+".pdf")
 		print("\nFinished: success.")
 		if dont_open_pdf == False:
@@ -89,6 +91,8 @@ def compare_preprints(arxiv_ID, version_a, version_b,keep_temp,show_latex_output
 	#8. Delete temporary files
 	if keep_temp == False:
 		remove_temporary_files(arxiv_ID)
+
+	return success
 
 def Generate_PDF(file, folder, show_latex_output):
 	os.chdir(folder)

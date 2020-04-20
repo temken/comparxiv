@@ -2,7 +2,7 @@
 A wrapper of [**latexdiff**](https://ctan.org/pkg/latexdiff?lang=en) to compare two version of an [arXiv](https://arxiv.org) preprint with a single command.
 
 
-> This is a beta version. Despite extensive testing, it does not work for all preprints on arXiv.
+> This is a beta version. Despite extensive testing, it does not work for all preprints on arXiv. Especially older preprints can be problematic.
 
 ## INSTALLATION
 You can install *comparxiv* via
