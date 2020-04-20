@@ -1,0 +1,54 @@
+language: python
+
+matrix:
+  include:
+    - os: linux
+      sudo: required
+      python: 3.6
+      dist: xenial
+
+    - os: osx
+      osx_image: xcode10
+      language: generic
+      env: PYTHON=36
+
+before_install:
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then sudo apt-get install -y --no-install-recommends texlive-full; fi
+  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then brew install ccache; fi
+  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then travis_wait brew cask install mactex; fi
+  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then export PATH="$PATH:/Library/TeX/texbin"; fi
+
+# addons:
+#   apt:
+#     # packages:
+#     #   - texlive-full
+#     update: true
+#   homebrew:
+#     casks:
+#     - mactex-no-gui
+#     # update: true
+
+install:
+  - pip install pytest pytest-cov python-coveralls
+
+  - pip install .
+
+before_cache:
+  - brew cleanup
+
+cache:
+  ccache: true
+  pip: true
+  directories:
+    - $HOME/Library/Caches/Homebrew
+
+script:
+  - which pdflatex
+  - which latexdiff
+  - pytest --cov=comparxiv comparxiv/tests
+
+after_success:
+  - coveralls
+
+notifications:
+  email: false
