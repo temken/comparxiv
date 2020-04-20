@@ -4,6 +4,7 @@ import os
 import sys
 import requests
 
+from sys import platform
 from tqdm import tqdm
 
 version = '0.1.0'
@@ -78,7 +79,10 @@ def compare_preprints(arxiv_ID, version_a, version_b,keep_temp,show_latex_output
 		os.system("mv " +temp_folder_b+diff_file+".pdf" + " ./" + diff_file+".pdf")
 		print("\nFinished: success.")
 		if dont_open_pdf == False:
-			os.system("open "+diff_file+".pdf")
+			if platform == "linux" or platform == "linux2":
+				os.system("xdg-open "+diff_file+".pdf")
+			elif platform == "darwin":
+				os.system("open "+diff_file+".pdf")
 	else:
 		print("\nFinished: failure. No pdf file could be generated.")
 	
