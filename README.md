@@ -1,5 +1,8 @@
 # comparXiv 
-Script to compare two version of an arXiv preprint.
+A wrapper of [**latexdiff**](https://ctan.org/pkg/latexdiff?lang=en) to compare two version of an [arXiv](https://arxiv.org) preprint with a single command.
+
+
+> This is a beta version. Despite extensive testing, it does not work for all preprints on arXiv.
 
 ## INSTALLATION
 You can install *comparxiv* via
@@ -25,7 +28,7 @@ or simply
 comparxiv hep-ph/0612370
 ```
 
-After a successful run, you should find a latexdiff-generated PDF file in your folder.
+A successful run will generate a pdf and open it.
 
 For more details about e.g. default arguments and options, simply run
 ```
@@ -40,7 +43,7 @@ comparxiv --help
 
 ## VERSIONS
 
-- **v1.0** (xx/xx/2020): First version released.
+- **v0.1.0** (xx/04/2020): First version released.
 
 ## AUTHORS & CONTACT
 
@@ -68,5 +71,4 @@ I am grateful for [this useful tutorial](https://python-packaging.readthedocs.io
 - [x]Handle old arxiv numbers.
 - [ ]Set up tests.
 - [ ]Publish the first version.
-- [ ]Compare references, identify removed/added references.
 - [ ]Compare figures, identify removed/added figures.

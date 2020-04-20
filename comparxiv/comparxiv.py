@@ -6,7 +6,7 @@ import requests
 
 from tqdm import tqdm
 
-version = '1.0'
+version = '0.1'
 author = 'Timon Emken'
 year = '2020'
 
@@ -47,7 +47,7 @@ def compare_preprints(arxiv_ID, version_a, version_b,keep_temp,show_latex_output
 	# 	print("\t",temp_folder_b+bbl_file_b)
 	# 	os.system("latexdiff --append-textcmd=field "+temp_folder_a+bbl_file_a+" "+temp_folder_b+bbl_file_b+">"+temp_folder_b+diff_file+".bbl")
 
-	if bbl_file_b!= None:
+	if bbl_file_b != None:
 		os.system("cp "+ temp_folder_b + bbl_file_b + " " +temp_folder_b+diff_file+".bbl")
 
 	#2.4 Run latexdiff on the tex files
@@ -72,23 +72,20 @@ def compare_preprints(arxiv_ID, version_a, version_b,keep_temp,show_latex_output
 	os.system("mv " + diff_file+".pdf" + " ../" + diff_file+".pdf")
 	os.chdir("..")
 
-	#3. Compare references.
+	#3. Compare figures
+	# todo
 
-	#4. Extract comments
-
-	#5. Compare figures
-
-	#6. Delete temporary files
+	#4. Delete temporary files
 	if keep_temp == False:
 		remove_temporary_files(arxiv_ID)
 
-	#7. Open PDF
+	#5. Open PDF
 	if os.path.isfile(diff_file+".pdf"):
 		print("\nFinished: success.")
 		if dont_open_pdf == False:
 			print("\tOpen the pdf.")
 			os.system("open "+diff_file+".pdf")
-		
+	#  use xdg-open	on linux
 	else:
 		print("\nFinished: failure.\n\tNo pdf file could be generated.")
 
