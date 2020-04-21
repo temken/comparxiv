@@ -36,9 +36,11 @@ or simply
 comparxiv hep-ph/0612370
 ```
 
+(By default, comparxiv compares version 1 and 2).
+
 A successful run will generate a pdf and open it.
 
-For more details about e.g. default arguments and options, simply run
+For more details and options, run
 ```
 comparxiv --help
 ```
@@ -53,7 +55,7 @@ comparxiv --help
 
 ## VERSIONS
 
-- **v0.1.0** (xx/04/2020): First version released.
+- **v0.1.0** (22/04/2020): First version released.
 
 ## AUTHORS & CONTACT
 
@@ -69,16 +71,3 @@ This project is licensed under the MIT License - see the LICENSE file.
 ## ACKNOWLEDGEMENTS
 
 I am grateful for [this useful tutorial](https://python-packaging.readthedocs.io/en/latest/index.html) by Scott Torborg about python packaging.
-
-## TO-DO
-
-- [x]Handle multiple tex files and identify the master file accurately.
-- [x]Make it a proper, installable executable script, that works from any directory.
-- [x]Progress bar with tqdm.
-- [x]Handle the inline arguments properly, especially when they are invalid.
-- [x]Option to deactivate the removal of the temp files (ideally with an option flag).
-- [x]Reduce the amount of pdflatex/latexdiff terminal output.
-- [x]Handle old arxiv numbers.
-- [ ]Set up tests.
-- [ ]Publish the first version.
-- [ ]Compare figures, identify removed/added figures.
