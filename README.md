@@ -48,10 +48,10 @@ comparxiv --help
 ## DEPENDENCIES
 
 - a tex distribution with pdflatex and latexdiff
-- argparse (*)
-- tqdm (*)
+- argparse [^1]
+- tqdm [^1]
 
-> (*) Get installed automatically via pip, if necessary.
+> [^1]: Get installed automatically via pip, if necessary.
 
 ## VERSIONS
 
