@@ -9,8 +9,8 @@ A wrapper of [**latexdiff**](https://ctan.org/pkg/latexdiff?lang=en) to compare 
 
 | Branch      | Build status |  Code coverage |
 | ----------- | ----------- |----------- |
-| master      | [![Build Status](https://travis-ci.com/temken/comparXiv.svg?token=CWyAeZfiHMD8t4eitDid&branch=master)](https://travis-ci.com/temken/comparXiv)      |		|
-| dev   | [![Build Status](https://travis-ci.com/temken/comparXiv.svg?token=CWyAeZfiHMD8t4eitDid&branch=dev)](https://travis-ci.com/temken/comparXiv)        |			|
+| master      | [![Build Status](https://travis-ci.com/temken/comparxiv.svg?token=CWyAeZfiHMD8t4eitDid&branch=master)](https://travis-ci.com/temken/comparxiv)      |		|
+| dev   | [![Build Status](https://travis-ci.com/temken/comparxiv.svg?token=CWyAeZfiHMD8t4eitDid&branch=dev)](https://travis-ci.com/temken/comparxiv)        |			|
 
 ## INSTALLATION
 You can install *comparxiv* via
