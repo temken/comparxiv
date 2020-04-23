@@ -17,6 +17,18 @@ def main():
 	parser.add_argument("version_B", help = "The new version of the preprint to be compared. (Default: 2)",
 						nargs='?', default = 2, type = check_version_input)
 	args = parser.parse_args()
+
+	#The user might have specified a version in the ID.
+	if "v" in args.arxiv_ID:
+		user_given_version = int(args.arxiv_ID.split("v",1)[1])
+		args.arxiv_ID = args.arxiv_ID.split("v",1)[0]
+		if user_given_version == 1:
+			args.version_A = 1
+			args.version_B = 2
+		elif user_given_version > 1:
+			args.version_A = user_given_version-1
+			args.version_B = user_given_version
+	
 	comparxiv.print_title(args.arxiv_ID,args.version_A,args.version_B)
 	comparxiv.compare_preprints(args.arxiv_ID,args.version_A,args.version_B,args.keep_temp_files,args.show_pdflatex_output,args.dont_open_pdf)
 
