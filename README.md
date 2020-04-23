@@ -52,6 +52,7 @@ comparxiv --help
 - a tex distribution with pdflatex and latexdiff (*)
 - argparse (**)
 - tqdm (**)
+- requests (**)
 
 > (*) Are part of any tex distribution, which can be installed on Linux e.g. via
 > ```
@@ -65,7 +66,7 @@ comparxiv --help
 
 ## VERSIONS
 
-- **v0.1.0** (24/04/2020): First version released.
+- **v0.1** (24/04/2020): First version released.
 
 ## AUTHORS & CONTACT
 

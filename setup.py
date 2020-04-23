@@ -5,7 +5,7 @@ def readme():
         return f.read()
 
 setup(name='comparxiv',
-      version='0.1.0',
+      version='0.1.1',
       description='Compare two versions of an arXiv preprint with latexdiff.',
       long_description = readme(),
       long_description_content_type='text/markdown',
@@ -17,7 +17,8 @@ setup(name='comparxiv',
       packages=['comparxiv'],
       install_requires=[
           'tqdm',
-          'argparse'
+          'argparse',
+          'requests'
       ],
       entry_points = {
         'console_scripts': ['comparxiv=comparxiv.command_line:main'],
