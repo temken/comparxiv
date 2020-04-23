@@ -18,19 +18,8 @@ before_install:
   - if [ "$TRAVIS_OS_NAME" = "osx" ]; then travis_wait brew cask install mactex; fi
   - if [ "$TRAVIS_OS_NAME" = "osx" ]; then export PATH="$PATH:/Library/TeX/texbin"; fi
 
-# addons:
-#   apt:
-#     # packages:
-#     #   - texlive-full
-#     update: true
-#   homebrew:
-#     casks:
-#     - mactex-no-gui
-#     # update: true
-
 install:
-  - pip install pytest pytest-cov python-coveralls
-
+  - pip install pytest pytest-cov coveralls
   - pip install .
 
 before_cache:
@@ -39,8 +28,6 @@ before_cache:
 cache:
   ccache: true
   pip: true
-  directories:
-    - $HOME/Library/Caches/Homebrew
 
 script:
   - which pdflatex

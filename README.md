@@ -1,19 +1,15 @@
+
+[![Build Status](https://travis-ci.com/temken/comparxiv.svg?token=CWyAeZfiHMD8t4eitDid&branch=dev)](https://travis-ci.com/temken/comparxiv)
+[![Coverage Status](https://coveralls.io/repos/github/temken/comparxiv/badge.svg?branch=dev)](https://coveralls.io/github/temken/comparxiv?branch=dev)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
 # comparxiv 
+
 A wrapper of [**latexdiff**](https://ctan.org/pkg/latexdiff?lang=en) to compare two version of an [arXiv](https://arxiv.org) preprint with a single command.
 
 <img src="https://user-images.githubusercontent.com/29034913/80016516-81de0b00-84d3-11ea-92b9-325fd2e219f4.png" width="750">
 
-
-> **Disclaimer:** This is a beta version. Despite extensive testing, it does not work for all preprints on arXiv. (Especially older preprints can be problematic.)
-
-## BUILD AND COVERAGE STATUS
-
-| Branch      | Build status |  Code coverage |
-| ----------- | ----------- |----------- |
-| master      | [![Build Status](https://travis-ci.com/temken/comparxiv.svg?token=CWyAeZfiHMD8t4eitDid&branch=master)](https://travis-ci.com/temken/comparxiv)      |		|
-| dev   | [![Build Status](https://travis-ci.com/temken/comparxiv.svg?token=CWyAeZfiHMD8t4eitDid&branch=dev)](https://travis-ci.com/temken/comparxiv)        |			|
+> **Disclaimer:** This is a beta version. Despite extensive testing, it does not work for all preprints on arXiv. Especially older preprints can cause problems.
 
 ## INSTALLATION
 You can install *comparxiv* via
@@ -58,20 +54,18 @@ comparxiv --help
 - tqdm (**)
 
 > (*) Are part of any tex distribution, which can be installed on Linux e.g. via
-```
-sudo apt-get install texlive-full
-```
-
-or on macOS e.g. using [homebrew](https://brew.sh/).
-```
-brew cask install mactex
-```
-
+> ```
+> sudo apt-get install texlive-full
+> ```
+> or on macOS e.g. using [homebrew](https://brew.sh/).
+> ```
+> brew cask install mactex
+> ```
 > (**): Get installed automatically via pip, if necessary.
 
 ## VERSIONS
 
-- **v0.1.0** (22/04/2020): First version released.
+- **v0.1.0** (24/04/2020): First version released.
 
 ## AUTHORS & CONTACT
 
