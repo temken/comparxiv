@@ -7,7 +7,7 @@
 
 A wrapper of [**latexdiff**](https://ctan.org/pkg/latexdiff?lang=en) to compare two version of an [arXiv](https://arxiv.org) preprint with a single command.
 
-<img src="https://user-images.githubusercontent.com/29034913/80016516-81de0b00-84d3-11ea-92b9-325fd2e219f4.png" width="750">
+<img src="https://user-images.githubusercontent.com/29034913/80139519-e28a4800-85a6-11ea-92f4-1210c1070376.png" width="750">
 
 > **Disclaimer:** This is a beta version. Despite extensive testing, it does not work for all preprints on arXiv. Especially older preprints can cause problems.
 
@@ -38,6 +38,14 @@ comparxiv hep-ph/0612370
 ```
 
 (By default, comparxiv compares version 1 and 2).
+
+It is also possible to run
+
+```
+comparxiv 1709.06573v*N*
+```
+
+This will compare version *N* to *N-1*, and the optional second and third arguments are ignored.
 
 A successful run will generate a pdf and open it.
 

@@ -7,7 +7,7 @@ import requests
 from sys import platform
 from tqdm import tqdm
 
-version = '0.1.0'
+version = '0.1.2'
 author = 'Timon Emken'
 year = '2020'
 
