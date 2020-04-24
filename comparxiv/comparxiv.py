@@ -7,10 +7,11 @@ import requests
 from sys import platform
 from tqdm import tqdm
 
-version = '0.1.2'
+version = '0.1.3'
 author = 'Timon Emken'
 year = '2020'
 
+temp_folder = ".temp_comparxiv/"
 def compare_preprints(arxiv_ID, version_a, version_b,keep_temp,show_latex_output,dont_open_pdf):
 
 	#Check if old or new arxiv ID
@@ -21,8 +22,12 @@ def compare_preprints(arxiv_ID, version_a, version_b,keep_temp,show_latex_output
 		ID_a = arxiv_ID+"v"+str(version_a)
 		ID_b = arxiv_ID+"v"+str(version_b)
 
-	temp_folder_a = './.temp_'+ID_a+'/'
-	temp_folder_b = './.temp_'+ID_b+'/'
+	#Create folder for temporary files
+	if os.path.exists(temp_folder) == False:
+		os.mkdir(temp_folder)
+
+	temp_folder_a = './' + temp_folder + 'temp_' + ID_a+'/'
+	temp_folder_b = './' + temp_folder + 'temp_' + ID_b+'/'
 	diff_file = os.path.split(arxiv_ID)[-1]+"_v"+str(version_a)+"v"+str(version_b)
 
 	# #1. Download and unpack files
@@ -90,7 +95,7 @@ def compare_preprints(arxiv_ID, version_a, version_b,keep_temp,show_latex_output
 	
 	#8. Delete temporary files
 	if keep_temp == False:
-		remove_temporary_files(arxiv_ID)
+		remove_temporary_files(ID_a)
 
 	return success
 
@@ -103,7 +108,7 @@ def Generate_PDF(file, folder, show_latex_output):
 	print("\t",pdflatex_command,"\n")
 	os.system(pdflatex_command)
 	os.system(pdflatex_command)
-	os.chdir("..")
+	os.chdir("../..")
 
 
 #Download the files from the preprint server, if it hasn't been done before.
@@ -132,10 +137,10 @@ def download_from_url(url, destination):
 def download_from_arxiv(arxiv_ID,version):
 	#Check if old or new arxiv ID
 	if "/" in arxiv_ID:
-		filepath = "./"+os.path.split(arxiv_ID)[-1]+"v"+str(version)
+		filepath = "./"+temp_folder+os.path.split(arxiv_ID)[-1]+"v"+str(version)
 		
 	else:
-		filepath = "./"+arxiv_ID+"v"+str(version)
+		filepath = "./"+temp_folder+arxiv_ID+"v"+str(version)
 
 	if os.path.isfile(filepath) == False:
 		url="https://arxiv.org/e-print/"+arxiv_ID+"v"+str(version)
@@ -148,14 +153,16 @@ def unpack_source_files(arxiv_ID,version,path_destination):
 	version_ID = arxiv_ID+"v"+str(version)
 	#Check if old or new arxiv ID
 	if "/" in arxiv_ID:
-		path_source = "./"+os.path.split(version_ID)[-1]
+		path_source = "./"+temp_folder+os.path.split(version_ID)[-1]
 	else:
-		path_source = "./"+version_ID
+		path_source = "./"+temp_folder+version_ID
+
+	print(path_destination,path_source)
 
 	# Create folder for temporary files
 	print("Unpack source files of",version_ID,"to",path_destination,".")
 	if os.path.isfile(path_source) and os.path.exists(path_destination) == False:
-		os.mkdir(path_destination)
+		os.makedirs(path_destination)
 	# Unpack files
 	os.system('tar -xzf '+path_source +' -C '+ path_destination)
 
@@ -191,11 +198,8 @@ def identify_bbl_file(path, arxiv_ID):
 	return bbl_file
 
 def remove_temporary_files(arxiv_ID):
-	print("Delete temporary files:")
-	for file in os.listdir("."):
-		if file.startswith(".temp_"+arxiv_ID) or (file.startswith(arxiv_ID) and not file.endswith("pdf")):
-			print("\t",file)
-			os.system("rm -r "+ file)
+	print("Delete temporary files.")
+	os.system("rm -r "+ temp_folder)
 
 def print_title(ID,v1,v2):
 	asci_title = "                                    __  ___       \n  ___ ___  _ __ ___  _ __   __ _ _ _\ \/ (_)_   __\n / __/ _ \| '_ ` _ \| '_ \ / _` | '__\  /| \ \ / /\n| (_| (_) | | | | | | |_) | (_| | |  /  \| |\ V / \n \___\___/|_| |_| |_| .__/ \__,_|_| /_/\_\_| \_/  \n                    |_|                           \n"

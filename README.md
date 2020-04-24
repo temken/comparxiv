@@ -42,7 +42,7 @@ comparxiv hep-ph/0612370
 It is also possible to run
 
 ```
-comparxiv 1709.06573v*N*
+comparxiv 1709.06573v[N]
 ```
 
 This will compare version *N* to *N-1*, and the optional second and third arguments are ignored.

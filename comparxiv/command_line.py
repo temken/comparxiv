@@ -11,7 +11,7 @@ def main():
 	parser.add_argument("-P","--dont_open_pdf", help="Do not automatically open the generated pdf in the end.",
                     action="store_true")
 	parser.add_argument("arxiv_ID", help = "The arXiv ID of the paper to be compared, e.g. \'1905.06348\'.",
-						type = str)
+						type = check_arxiv_ID)
 	parser.add_argument("version_A", help = "The reference version of the preprint to be compared. (Default: 1)",
 						nargs='?', default = 1, type = check_version_input)
 	parser.add_argument("version_B", help = "The new version of the preprint to be compared. (Default: 2)",
@@ -40,3 +40,19 @@ def check_version_input(value):
 	if ivalue < 1:
 		raise argparse.ArgumentTypeError("Version %s is an invalid arXiv version." % value)
 	return ivalue
+
+def check_arxiv_ID(ID):
+	is_valid_ID = False
+	# New IDs
+	if ID[4] == "." and ID.split(".",1)[0].isdigit() and int(ID[2:4])<13 and ID[-1].isdigit():
+		is_valid_ID = True
+	# Old IDs
+	elif "/" in ID:
+		i = ID.find("/")
+		if ID[i+3:i+5].isdigit() and int(ID[i+3:i+5]) < 13 and ID[-1].isdigit():
+			is_valid_ID = True
+	if is_valid_ID:
+		return ID
+	else:
+		raise argparse.ArgumentTypeError("The input %s is not a valid arXiv ID." % ID)
+	
