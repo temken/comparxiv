@@ -7,12 +7,12 @@ import requests
 from sys import platform
 from tqdm import tqdm
 
-version = '0.1.3'
+version = '0.1.4'
 author = 'Timon Emken'
 year = '2020'
 
 temp_folder = ".temp_comparxiv/"
-def compare_preprints(arxiv_ID, version_a, version_b,keep_temp,show_latex_output,dont_open_pdf):
+def compare_preprints(arxiv_ID, version_a, version_b,keep_temp,show_latex_output,dont_open_pdf,dont_compare_equations):
 
 	#Check if old or new arxiv ID
 	if "/" in arxiv_ID:
@@ -49,10 +49,15 @@ def compare_preprints(arxiv_ID, version_a, version_b,keep_temp,show_latex_output
 	print("Run latexdiff on .tex files:")
 	print("\t",temp_folder_a+master_file_a)
 	print("\t",temp_folder_b+master_file_b)
+
+	latexdiff_command_tex = "latexdiff "
 	if show_latex_output == False:
-		latexdiff_command_tex = "latexdiff --ignore-warnings "+temp_folder_a+master_file_a+" "+temp_folder_b+master_file_b+">"+temp_folder_b+diff_file+".tex"
-	else:
-		latexdiff_command_tex = "latexdiff "+temp_folder_a+master_file_a+" "+temp_folder_b+master_file_b+">"+temp_folder_b+diff_file+".tex"
+		latexdiff_command_tex += "--ignore-warnings "
+	if dont_compare_equations:
+		latexdiff_command_tex += "--math-markup=0 "
+	
+	latexdiff_command_tex += temp_folder_a+master_file_a+" "+temp_folder_b+master_file_b+">"+temp_folder_b+diff_file+".tex"
+
 	os.system(latexdiff_command_tex)
 
 	#3.2 Try to run latexdiff on bbl.
@@ -91,7 +96,9 @@ def compare_preprints(arxiv_ID, version_a, version_b,keep_temp,show_latex_output
 			elif platform == "darwin":
 				os.system("open "+diff_file+".pdf")
 	else:
-		print("\nFinished: failure. No pdf file could be generated.")
+		print("\nFinished: failure. No pdf file could be generated.\nTroubleshooting:")
+		print("\t1.) To see more terminal output run:\n\t\t'comparxiv --show_latex_output "+arxiv_ID+" "+str(version_a)+" " + str(version_b) +"'")
+		print("\t2.) In some cases latex math environments cause problems with latexdiff. Try running:\n\t\t'comparxiv --dont_compare_equations "+arxiv_ID+" "+str(version_a)+" " + str(version_b) +"'")
 	
 	#8. Delete temporary files
 	if keep_temp == False:
@@ -198,7 +205,6 @@ def identify_bbl_file(path, arxiv_ID):
 	return bbl_file
 
 def remove_temporary_files(arxiv_ID):
-	print("Delete temporary files.")
 	os.system("rm -r "+ temp_folder)
 
 def print_title(ID,v1,v2):
