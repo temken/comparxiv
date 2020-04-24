@@ -28,7 +28,9 @@ def main():
 		elif user_given_version > 1:
 			args.version_A = user_given_version-1
 			args.version_B = user_given_version
-	
+	elif args.version_A == args.version_B:
+		raise argparse.ArgumentTypeError("Versions to compare are identical.")
+
 	comparxiv.print_title(args.arxiv_ID,args.version_A,args.version_B)
 	comparxiv.compare_preprints(args.arxiv_ID,args.version_A,args.version_B,args.keep_temp_files,args.show_pdflatex_output,args.dont_open_pdf)
 
