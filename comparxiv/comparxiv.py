@@ -30,7 +30,8 @@ def compare_preprints(arxiv_ID, version_a, version_b,keep_temp,show_latex_output
 	temp_folder_b = './' + temp_folder + 'temp_' + ID_b+'/'
 	diff_file = os.path.split(arxiv_ID)[-1]+"_v"+str(version_a)+"v"+str(version_b)
 
-	# #1. Download and unpack files
+
+	#1. Download and unpack files
 	download_from_arxiv(arxiv_ID,version_a)
 	download_from_arxiv(arxiv_ID,version_b)
 	unpack_source_files(arxiv_ID,version_a,temp_folder_a)
@@ -150,7 +151,7 @@ def download_from_arxiv(arxiv_ID,version):
 		filepath = "./"+temp_folder+arxiv_ID+"v"+str(version)
 
 	if os.path.isfile(filepath) == False:
-		url="https://arxiv.org/e-print/"+arxiv_ID+"v"+str(version)
+		url="https://arxiv.org/src/"+arxiv_ID+"v"+str(version)
 		download_from_url(url,filepath)
 	else:
 		print("Download of source files for "+arxiv_ID+"v"+str(version)+" not necessary.")
@@ -163,9 +164,6 @@ def unpack_source_files(arxiv_ID,version,path_destination):
 		path_source = "./"+temp_folder+os.path.split(version_ID)[-1]
 	else:
 		path_source = "./"+temp_folder+version_ID
-
-	print(path_destination,path_source)
-
 	# Create folder for temporary files
 	print("Unpack source files of",version_ID,"to",path_destination,".")
 	if os.path.isfile(path_source) and os.path.exists(path_destination) == False:
@@ -174,22 +172,28 @@ def unpack_source_files(arxiv_ID,version,path_destination):
 	os.system('tar -xzf '+path_source +' -C '+ path_destination)
 
 def identify_master_tex_file(path,arxiv_ID):
+	master_file = None
 	tex_files = []
-	for file in os.listdir(path):
+	files = os.listdir(path)
+	for file in files:
 		if file.endswith(".tex") and (file.startswith(arxiv_ID) or file.startswith(os.path.split(arxiv_ID)[-1]))== False:
 			tex_files.append(file)
-	if len(tex_files) == 1:
-		master_file = tex_files[0]
-	else:
+	if len(tex_files) > 1:
 		for file in tex_files:
 			with open(path+file) as f:
 				if 'begin{document}' in f.read():
 					master_file = file
 					break
-		else:
-			print("Error in identify_master_tex_file(): Among the ",len(tex_files)," tex files, no master file could be identified.")
-			os.abort()
-	return master_file
+	elif len(tex_files) == 1:
+		master_file = tex_files[0]
+	elif len(tex_files) == 0 and len(files)==1:
+		os.rename(path + file, path + file + ".tex")
+		master_file = file + ".tex"
+	if master_file == None:
+		print("Error in identify_master_tex_file(): Among the ",len(tex_files)," tex files, no master file could be identified.")
+		os.abort()
+	else:
+		return master_file
 
 def identify_bbl_file(path, arxiv_ID):
 	# Possibility a: A .bbl file exists.
