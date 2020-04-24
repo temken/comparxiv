@@ -2,17 +2,18 @@
 
 import os
 import sys
+import arxiv
 import requests
 
 from sys import platform
 from tqdm import tqdm
 
-version = '0.1.3'
+version = '0.1.4'
 author = 'Timon Emken'
 year = '2020'
 
 temp_folder = ".temp_comparxiv/"
-def compare_preprints(arxiv_ID, version_a, version_b,keep_temp,show_latex_output,dont_open_pdf):
+def compare_preprints(arxiv_ID, version_a, version_b,keep_temp,show_latex_output,dont_open_pdf,dont_compare_equations):
 
 	#Check if old or new arxiv ID
 	if "/" in arxiv_ID:
@@ -30,36 +31,43 @@ def compare_preprints(arxiv_ID, version_a, version_b,keep_temp,show_latex_output
 	temp_folder_b = './' + temp_folder + 'temp_' + ID_b+'/'
 	diff_file = os.path.split(arxiv_ID)[-1]+"_v"+str(version_a)+"v"+str(version_b)
 
-	# #1. Download and unpack files
+	print_paper_information(arxiv_ID,version_a,version_b)
+
+	#1. Download and unpack files
+	print("1.) Download and unpack source files:")
 	download_from_arxiv(arxiv_ID,version_a)
 	download_from_arxiv(arxiv_ID,version_b)
+
 	unpack_source_files(arxiv_ID,version_a,temp_folder_a)
 	unpack_source_files(arxiv_ID,version_b,temp_folder_b)
 
 	#2. Identify the .tex and .bbl files.
 	#2.1 tex files
+	print("\n2.1) Identify master tex files:")
 	master_file_a = identify_master_tex_file(temp_folder_a,arxiv_ID)
 	master_file_b = identify_master_tex_file(temp_folder_b,arxiv_ID)
 	#2.2 bbl files
+	print("\n2.2) Identify bbl files:")
 	bbl_file_a = identify_bbl_file(temp_folder_a,arxiv_ID)
 	bbl_file_b = identify_bbl_file(temp_folder_b,arxiv_ID)
 
 	#3. Latexdiff
 	#3.1 tex files 
-	print("Run latexdiff on .tex files:")
-	print("\t",temp_folder_a+master_file_a)
-	print("\t",temp_folder_b+master_file_b)
+	print("\n3.1) Run latexdiff on the tex files.")
+
+	latexdiff_command_tex = "latexdiff "
 	if show_latex_output == False:
-		latexdiff_command_tex = "latexdiff --ignore-warnings "+temp_folder_a+master_file_a+" "+temp_folder_b+master_file_b+">"+temp_folder_b+diff_file+".tex"
-	else:
-		latexdiff_command_tex = "latexdiff "+temp_folder_a+master_file_a+" "+temp_folder_b+master_file_b+">"+temp_folder_b+diff_file+".tex"
+		latexdiff_command_tex += "--ignore-warnings "
+	if dont_compare_equations:
+		latexdiff_command_tex += "--math-markup=0 "
+	
+	latexdiff_command_tex += temp_folder_a+master_file_a+" "+temp_folder_b+master_file_b+">"+temp_folder_b+diff_file+".tex"
+
 	os.system(latexdiff_command_tex)
 
 	#3.2 Try to run latexdiff on bbl.
 	if bbl_file_a != None and bbl_file_b != None:
-		print("\nRun latexdiff on .bbl files:")
-		print("\t",temp_folder_a+bbl_file_a)
-		print("\t",temp_folder_b+bbl_file_b)
+		print("\n3.2) Run latexdiff on the bbl files.")
 		if show_latex_output == False:
 			latexdiff_command_bbl = "latexdiff --ignore-warnings "+temp_folder_a+bbl_file_a+" "+temp_folder_b+bbl_file_b+">"+temp_folder_b+diff_file+".bbl"
 		else:
@@ -67,11 +75,12 @@ def compare_preprints(arxiv_ID, version_a, version_b,keep_temp,show_latex_output
 		os.system(latexdiff_command_bbl)
 
 	#4. Run pdflatex
+	print("\n4.) Generate a pdf with pdflatex.")
 	Generate_PDF(diff_file,temp_folder_b,show_latex_output)
 
 	#5. If unsuccessful, try again with a copy of the version b .bbl file.
 	if bbl_file_b != None and os.path.isfile(temp_folder_b+diff_file+".pdf") == False:
-		print("\nCopy the .bbl file of version b.")
+		print("\tWarning: No pdf could be generated. Copy the .bbl file of version b and try again.")
 		os.system("cp "+ temp_folder_b + bbl_file_b + " " + temp_folder_b + diff_file+".bbl")
 		Generate_PDF(diff_file,temp_folder_b,show_latex_output)
 	
@@ -84,14 +93,17 @@ def compare_preprints(arxiv_ID, version_a, version_b,keep_temp,show_latex_output
 	#7. If successful copy the .pdf.
 	if success:
 		os.system("mv " +temp_folder_b+diff_file+".pdf" + " ./" + diff_file+".pdf")
-		print("\nFinished: success.")
 		if dont_open_pdf == False:
 			if platform == "linux" or platform == "linux2":
 				os.system("xdg-open "+diff_file+".pdf")
 			elif platform == "darwin":
 				os.system("open "+diff_file+".pdf")
+			print("\nSuccess!")
+
 	else:
-		print("\nFinished: failure. No pdf file could be generated.")
+		print("\nFail! No pdf file could be generated.\nTroubleshooting:")
+		print("\t1.) To see more terminal output run:\n\t\t'comparxiv --show_latex_output "+arxiv_ID+" "+str(version_a)+" " + str(version_b) +"'")
+		print("\t2.) In some cases latex math environments cause problems with latexdiff. Try running:\n\t\t'comparxiv --dont_compare_equations "+arxiv_ID+" "+str(version_a)+" " + str(version_b) +"'")
 	
 	#8. Delete temporary files
 	if keep_temp == False:
@@ -99,13 +111,26 @@ def compare_preprints(arxiv_ID, version_a, version_b,keep_temp,show_latex_output
 
 	return success
 
+def print_paper_information(arxiv_ID,vA,vB):
+	papers = arxiv.query(query="",
+	    id_list=[arxiv_ID + "v" + str(vA),arxiv_ID + "v" + str(vB)],
+	    max_results=2)
+	print("Title:\t\t",papers[1].title)
+	if papers[0].title != papers[1].title:
+		print("Old title:\t",papers[0].title)
+
+	if len(papers[1].authors) == 1:
+		print("Author:\t",papers[1].authors[0],"\n")
+	elif len(papers[1].authors) > 6:
+		print("Authors:\t",papers[1].authors[0],"et al.","\n")
+	else:
+		print("Authors:\t",", " . join(papers[1].authors),"\n")
+
 def Generate_PDF(file, folder, show_latex_output):
 	os.chdir(folder)
 	pdflatex_command = "pdflatex -interaction=nonstopmode "+file+".tex"
 	if show_latex_output == False:
 		pdflatex_command += " 2>&1 > /dev/null"
-	print("Compile .tex file via")
-	print("\t",pdflatex_command,"\n")
 	os.system(pdflatex_command)
 	os.system(pdflatex_command)
 	os.chdir("../..")
@@ -143,7 +168,7 @@ def download_from_arxiv(arxiv_ID,version):
 		filepath = "./"+temp_folder+arxiv_ID+"v"+str(version)
 
 	if os.path.isfile(filepath) == False:
-		url="https://arxiv.org/e-print/"+arxiv_ID+"v"+str(version)
+		url="https://arxiv.org/src/"+arxiv_ID+"v"+str(version)
 		download_from_url(url,filepath)
 	else:
 		print("Download of source files for "+arxiv_ID+"v"+str(version)+" not necessary.")
@@ -156,49 +181,51 @@ def unpack_source_files(arxiv_ID,version,path_destination):
 		path_source = "./"+temp_folder+os.path.split(version_ID)[-1]
 	else:
 		path_source = "./"+temp_folder+version_ID
-
-	print(path_destination,path_source)
-
 	# Create folder for temporary files
-	print("Unpack source files of",version_ID,"to",path_destination,".")
 	if os.path.isfile(path_source) and os.path.exists(path_destination) == False:
 		os.makedirs(path_destination)
 	# Unpack files
 	os.system('tar -xzf '+path_source +' -C '+ path_destination)
 
 def identify_master_tex_file(path,arxiv_ID):
+	master_file = None
 	tex_files = []
-	for file in os.listdir(path):
+	files = os.listdir(path)
+	for file in files:
 		if file.endswith(".tex") and (file.startswith(arxiv_ID) or file.startswith(os.path.split(arxiv_ID)[-1]))== False:
 			tex_files.append(file)
-	if len(tex_files) == 1:
-		master_file = tex_files[0]
-	else:
+	if len(tex_files) > 1:
 		for file in tex_files:
 			with open(path+file) as f:
 				if 'begin{document}' in f.read():
 					master_file = file
 					break
-		else:
-			print("Error in identify_master_tex_file(): Among the ",len(tex_files)," tex files, no master file could be identified.")
-			os.abort()
-	return master_file
+	elif len(tex_files) == 1:
+		master_file = tex_files[0]
+	elif len(tex_files) == 0 and len(files)==1:
+		os.rename(path + file, path + file + ".tex")
+		master_file = file + ".tex"
+	if master_file == None:
+		print("Error in identify_master_tex_file(): Among the ",len(tex_files)," tex files, no master file could be identified.")
+		os.abort()
+	else:
+		print("\t",arxiv_ID+path[-4:-1],": ",master_file)
+		return master_file
 
 def identify_bbl_file(path, arxiv_ID):
 	# Possibility a: A .bbl file exists.
 	for file in os.listdir(path):
 		if file.endswith('.bbl') and not file.startswith(arxiv_ID):
 			bbl_file = file
-			print("Bibliography (.bbl) file in",path,":\t",bbl_file)
 			break
 	# Possibility b: No .bbl file exists.
 	else:
 		bbl_file = None
-		print("No .bbl file found in\t",path)
+
+	print("\t",arxiv_ID+path[-4:-1],": ",bbl_file)
 	return bbl_file
 
 def remove_temporary_files(arxiv_ID):
-	print("Delete temporary files.")
 	os.system("rm -r "+ temp_folder)
 
 def print_title(ID,v1,v2):

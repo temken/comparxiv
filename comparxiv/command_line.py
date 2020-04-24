@@ -6,9 +6,11 @@ def main():
 	parser = argparse.ArgumentParser(description="Comparxiv v" + comparxiv.version + ", developed by " + comparxiv.author + " ("+ comparxiv.year + ") - Compare two versions of an arXiv preprint.")
 	parser.add_argument("-T","--keep_temp_files", help="Do not delete temporary files in the end.",
                     action="store_true")
-	parser.add_argument("-L","--show_pdflatex_output", help="Show the terminal output of pdflatex.",
+	parser.add_argument("-L","--show_latex_output", help="Show the terminal output of pdflatex.",
                     action="store_true")
 	parser.add_argument("-P","--dont_open_pdf", help="Do not automatically open the generated pdf in the end.",
+                    action="store_true")
+	parser.add_argument("-E","--dont_compare_equations", help="Run latexdiff with the flag --math-markup=0.",
                     action="store_true")
 	parser.add_argument("arxiv_ID", help = "The arXiv ID of the paper to be compared, e.g. \'1905.06348\'.",
 						type = check_arxiv_ID)
@@ -28,9 +30,11 @@ def main():
 		elif user_given_version > 1:
 			args.version_A = user_given_version-1
 			args.version_B = user_given_version
-	
+	elif args.version_A == args.version_B:
+		raise argparse.ArgumentTypeError("Versions to compare are identical.")
+
 	comparxiv.print_title(args.arxiv_ID,args.version_A,args.version_B)
-	comparxiv.compare_preprints(args.arxiv_ID,args.version_A,args.version_B,args.keep_temp_files,args.show_pdflatex_output,args.dont_open_pdf)
+	comparxiv.compare_preprints(args.arxiv_ID,args.version_A,args.version_B,args.keep_temp_files,args.show_latex_output,args.dont_open_pdf,args.dont_compare_equations)
 
 def check_version_input(value):
 	try:
