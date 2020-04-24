@@ -90,7 +90,7 @@ def compare_preprints(arxiv_ID, version_a, version_b,keep_temp,show_latex_output
 	
 	#8. Delete temporary files
 	if keep_temp == False:
-		remove_temporary_files(arxiv_ID)
+		remove_temporary_files(ID_a)
 
 	return success
 
@@ -193,7 +193,7 @@ def identify_bbl_file(path, arxiv_ID):
 def remove_temporary_files(arxiv_ID):
 	print("Delete temporary files:")
 	for file in os.listdir("."):
-		if file.startswith(".temp_"+arxiv_ID) or (file.startswith(arxiv_ID) and not file.endswith("pdf")):
+		if file.startswith(".temp_"+arxiv_ID[0:7]) or (file.startswith(arxiv_ID[0:7]) and not file.endswith("pdf")):
 			print("\t",file)
 			os.system("rm -r "+ file)
 
