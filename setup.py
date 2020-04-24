@@ -18,7 +18,8 @@ setup(name='comparxiv',
       install_requires=[
           'tqdm',
           'argparse',
-          'requests'
+          'requests',
+          'arxiv'
       ],
       entry_points = {
         'console_scripts': ['comparxiv=comparxiv.command_line:main'],
