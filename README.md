@@ -9,7 +9,7 @@ A wrapper of [**latexdiff**](https://ctan.org/pkg/latexdiff?lang=en) to compare 
 
 <img src="https://user-images.githubusercontent.com/29034913/80139519-e28a4800-85a6-11ea-92f4-1210c1070376.png" width="750">
 
-> **Disclaimer:** This is a beta version. Despite extensive testing, it does not work for all preprints on arXiv. Especially older preprints can cause problems.
+> **Disclaimer:** This is a beta version. Despite extensive testing, it does not work for all preprints on arXiv.
 
 ## INSTALLATION
 You can install *comparxiv* via
@@ -31,21 +31,17 @@ To compare v1 and v2 of a paper with *comparxiv*, run e.g.
 comparxiv 1905.06348 1 2
 ```
 
-or simply
+The order of the last two arguments matters, the second version is interpreted as the *new* version. By default, comparxiv compares version 1 and 2, so it is possible to run
 
 ```
 comparxiv hep-ph/0612370
 ```
 
-(By default, comparxiv compares version 1 and 2).
-
-It is also possible to run
+Alternatively, the following command will compare version *N* to *N-1*, and the optional second and third arguments are ignored.
 
 ```
 comparxiv 1709.06573v[N]
 ```
-
-This will compare version *N* to *N-1*, and the optional second and third arguments are ignored.
 
 A successful run will generate a pdf and open it.
 
@@ -56,11 +52,12 @@ comparxiv --help
 
 ## DEPENDENCIES
 
-- python and pip
-- a tex distribution with pdflatex and latexdiff (*)
-- argparse (**)
-- tqdm (**)
-- requests (**)
+- [python](https://www.python.org/) and [pip](https://pypi.org/project/pip/)
+- a tex distribution with [pdflatex](https://linux.die.net/man/1/pdflatex) and [latexdiff](https://ctan.org/pkg/latexdiff?lang=en) (*)
+- [argparse](https://pypi.org/project/argparse/) (**)
+- [arxiv](https://pypi.org/project/arxiv/) (**)
+- [requests](https://pypi.org/project/requests/) (**)
+- [tqdm](https://pypi.org/project/tqdm/) (**)
 
 > (*) Are part of any tex distribution, which can be installed on Linux e.g. via
 > ```
@@ -75,6 +72,11 @@ comparxiv --help
 ## VERSIONS
 
 - **v0.1** (24/04/2020): First version released.
+
+## To-do list
+Planned features
+
+- comparison of figures
 
 ## AUTHORS & CONTACT
 
