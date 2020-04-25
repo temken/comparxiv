@@ -17,7 +17,7 @@ You can install *comparxiv* via
 pip install comparxiv
 ```
 
-or direct from source. Just run
+or direct from source.
 
 ```
 git clone https://github.com/temken/comparxiv.git
@@ -26,22 +26,38 @@ python setup.py install
 ```
 
 ## USAGE
-To compare v1 and v2 of a paper with *comparxiv*, run e.g.
-```
-comparxiv 1905.06348 1 2
-```
+There are three ways to run *comparxiv*:
 
-The order of the last two arguments matters, the second version is interpreted as the *new* version. By default, comparxiv compares version 1 and 2, so it is possible to run
+1. The easiest way is to simply provide a preprint ID such as
 
 ```
 comparxiv hep-ph/0612370
 ```
 
-Alternatively, the following command will compare version *N* to *N-1*, and the optional second and third arguments are ignored.
+This will compare the two latest versions of the paper.
+
+2. To compare version *N* with *N-1*, you can either run 
+```
+comparxiv 1709.06573vN 
+```
+or
+```
+comparxiv 1709.06573 N
+```
+
+3. To compare two specified version *N* and *M*, there are also two possible ways to give the input. Either
+```
+comparxiv 1905.06348 N M
+```
+
+or
 
 ```
-comparxiv 1709.06573v[N]
+comparxiv 1905.06348vN M 
 ```
+
+The order of the two arguments (N and M) matters, the second version (M) is interpreted as the *new* version. 
+
 
 A successful run will generate a pdf and open it.
 
@@ -77,6 +93,7 @@ comparxiv --help
 Planned features
 
 - comparison of figures
+- support of latex papers on biorxiv (?)
 
 ## AUTHORS & CONTACT
 
