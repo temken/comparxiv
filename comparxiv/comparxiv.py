@@ -8,12 +8,14 @@ import requests
 from sys import platform
 from tqdm import tqdm
 
-version = '0.1.4'
+version = '0.1.5'
 author = 'Timon Emken'
 year = '2020'
 
 temp_folder = ".temp_comparxiv/"
 def compare_preprints(arxiv_ID, version_a, version_b,keep_temp,show_latex_output,dont_open_pdf,dont_compare_equations):
+	check_arguments(arxiv_ID, version_a, version_b)
+	print_title(arxiv_ID, version_a, version_b)
 
 	#Check if old or new arxiv ID
 	if "/" in arxiv_ID:
@@ -98,10 +100,10 @@ def compare_preprints(arxiv_ID, version_a, version_b,keep_temp,show_latex_output
 				os.system("xdg-open "+diff_file+".pdf")
 			elif platform == "darwin":
 				os.system("open "+diff_file+".pdf")
-			print("\nSuccess!")
+		print("\nSuccess!")
 
 	else:
-		print("\nFail! No pdf file could be generated.\nTroubleshooting:")
+		print("\nFailure! No pdf file could be generated.\nTroubleshooting:")
 		print("\t1.) To see more terminal output run:\n\t\t'comparxiv --show_latex_output "+arxiv_ID+" "+str(version_a)+" " + str(version_b) +"'")
 		print("\t2.) In some cases latex math environments cause problems with latexdiff. Try running:\n\t\t'comparxiv --dont_compare_equations "+arxiv_ID+" "+str(version_a)+" " + str(version_b) +"'")
 	
@@ -115,16 +117,71 @@ def print_paper_information(arxiv_ID,vA,vB):
 	papers = arxiv.query(query="",
 	    id_list=[arxiv_ID + "v" + str(vA),arxiv_ID + "v" + str(vB)],
 	    max_results=2)
-	print("Title:\t\t",papers[1].title)
 	if papers[0].title != papers[1].title:
+		print("New title:\t",papers[1].title)
 		print("Old title:\t",papers[0].title)
-
+	else:
+		print("Title:\t\t",papers[1].title)
 	if len(papers[1].authors) == 1:
-		print("Author:\t",papers[1].authors[0],"\n")
+		print("Author:\t\t",papers[1].authors[0],"\n")
 	elif len(papers[1].authors) > 6:
 		print("Authors:\t",papers[1].authors[0],"et al.","\n")
 	else:
 		print("Authors:\t",", " . join(papers[1].authors),"\n")
+
+def check_arguments(arxiv_ID,vA,vB):
+	#1. Check for identical versions
+	if vA == vB:
+		print("Error:\tVersions to compare are identical.")
+		os.abort()
+	#2. Check if paper exists and has multiple versions.
+	latest_version = latest_available_version(arxiv_ID)
+	if latest_version == 1:
+		print("Error: The paper [%s] has only one version."%(arxiv_ID))
+		os.abort()
+	#3. Check existence of versions: If none or only one of the versions can be found, generate some meaningful error message.
+	papers = arxiv.query(query="",
+	    id_list=[arxiv_ID + "v" + str(vA),arxiv_ID + "v" + str(vB)],
+	    max_results=2)
+	if len(papers) < 2:
+		if vA > latest_version and vB > latest_version:
+			missing_version = "v%i or v%i"%(vA,vB)
+			suggestion_a = latest_version-1
+			suggestion_b = latest_version
+		elif vA > latest_version:
+			missing_version = "v%i"%(vA)
+			suggestion_a = latest_version
+			if vB == latest_version:
+				suggestion_b = vB - 1
+			else:
+				suggestion_b = vB 
+		elif vB > latest_version:
+			missing_version = "v%i"%(vB)
+			suggestion_b = latest_version
+			if vA == latest_version:
+				suggestion_a = vA - 1
+			else:
+				suggestion_a = vA 
+		print("Error:\tThe preprint [%s] does not have a version %s. The latest available version is v%i.\n\tTry running 'comparxiv %s %i %i'."%(arxiv_ID,missing_version,latest_version,arxiv_ID,suggestion_a,suggestion_b))
+		os.abort()	
+
+def latest_available_version(arxiv_ID):
+	papers= arxiv.query(query="",
+		id_list=[arxiv_ID],
+		max_results=1)
+	if len(papers) == 0:
+		print("Error: The paper [%s] cannot be found on the preprint server."%(arxiv_ID))
+		os.abort()
+	version_max = 1
+	while version_max < 100:
+		paper = arxiv.query(query="",
+			id_list=[arxiv_ID+"v"+str(version_max + 1)],
+			max_results=1)
+		if len(paper) == 0:
+			break
+		else:
+			version_max += 1
+	return version_max
 
 def Generate_PDF(file, folder, show_latex_output):
 	os.chdir(folder)
@@ -232,7 +289,7 @@ def print_title(ID,v1,v2):
 	asci_title = "                                    __  ___       \n  ___ ___  _ __ ___  _ __   __ _ _ _\ \/ (_)_   __\n / __/ _ \| '_ ` _ \| '_ \ / _` | '__\  /| \ \ / /\n| (_| (_) | | | | | | |_) | (_| | |  /  \| |\ V / \n \___\___/|_| |_| |_| .__/ \__,_|_| /_/\_\_| \_/  \n                    |_|                           \n"
 	print(asci_title)
 	print("Version ",version,", developed by",author,"("+year+")")
-	print("\nCompare [arXiv:"+ID+"]: v"+str(v1)+" vs v"+str(v2),"\n")
+	print("\nCompare [%s]: v%i vs v%i\n"%(ID,v1,v2))
 
 if __name__ == "__main__":
 	arxiv_ID = str(sys.argv[1])
