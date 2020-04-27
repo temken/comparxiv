@@ -28,7 +28,7 @@ python setup.py install
 ## USAGE
 There are three ways to run *comparxiv*:
 
-1. The easiest way is to simply provide a preprint ID such as
+**(A) ID**: The easiest way is to simply provide a preprint ID such as
 
 ```
 comparxiv hep-ph/0612370
@@ -36,7 +36,7 @@ comparxiv hep-ph/0612370
 
 This will compare the two latest versions of the paper.
 
-2. To compare version *N* with *N-1*, you can either run 
+**(B) ID + version**: To compare version *N* with *N-1*, you can either run 
 ```
 comparxiv 1709.06573vN 
 ```
@@ -45,7 +45,7 @@ or
 comparxiv 1709.06573 N
 ```
 
-3. To compare two specified version *N* and *M*, there are also two possible ways to give the input. Either
+**(B) ID + two versions**: To compare two specified version *N* and *M*, there are also two possible ways to give the input. Either
 ```
 comparxiv 1905.06348 N M
 ```
@@ -57,7 +57,6 @@ comparxiv 1905.06348vN M
 ```
 
 The order of the two arguments (N and M) matters, the second version (M) is interpreted as the *new* version. 
-
 
 A successful run will generate a pdf and open it.
 
