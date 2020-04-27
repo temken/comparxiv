@@ -140,10 +140,11 @@ def check_arguments(arxiv_ID,vA,vB):
 		print("Error: The paper [%s] has only one version."%(arxiv_ID))
 		os.abort()
 	#3. Check existence of versions: If none or only one of the versions can be found, generate some meaningful error message.
-	papers = arxiv.query(query="",
-	    id_list=[arxiv_ID + "v" + str(vA),arxiv_ID + "v" + str(vB)],
-	    max_results=2)
-	if len(papers) < 2:
+	# papers = arxiv.query(query="",
+	#     id_list=[arxiv_ID + "v" + str(vA),arxiv_ID + "v" + str(vB)],
+	#     max_results=2)
+	# if len(papers) < 2:
+	if vA > latest_version or vB > latest_version:
 		if vA > latest_version and vB > latest_version:
 			missing_version = "v%i or v%i"%(vA,vB)
 			suggestion_a = latest_version-1
@@ -177,10 +178,10 @@ def latest_available_version(arxiv_ID):
 		paper = arxiv.query(query="",
 			id_list=[arxiv_ID+"v"+str(version_max + 1)],
 			max_results=1)
-		if len(paper) == 0:
-			break
-		else:
+		if len(paper) > 0 and paper[0].id.split("v")[-1] == str(version_max + 1) :
 			version_max += 1
+		else:
+			break
 	return version_max
 
 def Generate_PDF(file, folder, show_latex_output):
