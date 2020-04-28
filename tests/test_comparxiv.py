@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 import os
 
-from ..comparxiv import *
-from ..command_line import *
+from comparxiv.comparxiv import *
+from comparxiv.command_line import *
 
 def test_comparxiv():
 	test_preprints = ["hep-ph/0612065","1709.06573","1901.04503","1905.05776"]
