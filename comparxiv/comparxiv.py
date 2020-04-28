@@ -114,8 +114,8 @@ def compare_preprints(arxiv_ID, version_a, version_b,keep_temp,show_latex_output
 
 	else:
 		print("\nFailure! No pdf file could be generated.\nTroubleshooting:")
-		print("\t1.) To see more terminal output run:\n\t\t'comparxiv --show_latex_output "+arxiv_ID+" "+str(version_a)+" " + str(version_b) +"'")
-		print("\t2.) In some cases latex math environments cause problems with latexdiff. Try running:\n\t\t'comparxiv --dont_compare_equations "+arxiv_ID+" "+str(version_a)+" " + str(version_b) +"'")
+		print("\t1.) To see more terminal output run:\n\t\t'comparxiv --show_latex_output %s %i %i'" % (arxiv_ID, version_a, version_b))
+		print("\t2.) In some cases latex math environments cause problems with latexdiff. Try running:\n\t\t'comparxiv --dont_compare_equations %s %i %i'" % (arxiv_ID, version_a, version_b))
 	
 	#8. Delete temporary files
 	if keep_temp == False:
@@ -128,14 +128,14 @@ def print_paper_information(arxiv_ID,vA,vB):
 	    id_list=[arxiv_ID + "v" + str(vA),arxiv_ID + "v" + str(vB)],
 	    max_results=2)
 	if papers[0].title != papers[1].title:
-		print("New title:\t",papers[1].title)
-		print("Old title:\t",papers[0].title)
+		print("New title:\t%s" % papers[1].title)
+		print("Old title:\t%s" % papers[0].title)
 	else:
-		print("Title:\t\t",papers[1].title)
+		print("Title:\t\t%s" % papers[1].title)
 	if len(papers[1].authors) == 1:
-		print("Author:\t\t",papers[1].authors[0],"\n")
+		print("Author:\t\t%s\n" % papers[1].authors[0])
 	elif len(papers[1].authors) > 6:
-		print("Authors:\t",papers[1].authors[0],"et al.","\n")
+		print("Authors:\t%s et al.\n" % papers[1].authors[0])
 	else:
 		print("Authors:\t",", " . join(papers[1].authors),"\n")
 
@@ -147,7 +147,7 @@ def check_arguments(arxiv_ID,vA,vB):
 	#2. Check if paper exists and has multiple versions.
 	latest_version = latest_available_version(arxiv_ID)
 	if latest_version == 1:
-		print("Error: The paper [%s] has only one version."%(arxiv_ID))
+		print("Error: The paper [%s] has only one version." % (arxiv_ID))
 		os.abort()
 	#3. Check existence of versions: If none or only one of the versions can be found, generate some meaningful error message.
 	elif vA > latest_version or vB > latest_version:
@@ -169,7 +169,7 @@ def check_arguments(arxiv_ID,vA,vB):
 				suggestion_a = vA - 1
 			else:
 				suggestion_a = vA 
-		print("Error:\tThe preprint [%s] does not have a version %s. The latest available version is v%i.\n\tTry running 'comparxiv %s %i %i'."%(arxiv_ID,missing_version,latest_version,arxiv_ID,suggestion_a,suggestion_b))
+		print("Error:\tThe preprint [%s] does not have a version %s. The latest available version is v%i.\n\tTry running 'comparxiv %s %i %i'." % (arxiv_ID,missing_version,latest_version,arxiv_ID,suggestion_a,suggestion_b))
 		os.abort()	
 
 def latest_available_version(arxiv_ID):
@@ -177,7 +177,7 @@ def latest_available_version(arxiv_ID):
 		id_list=[arxiv_ID],
 		max_results=1)
 	if len(papers) == 0:
-		print("Error: The paper [%s] cannot be found on the preprint server."%(arxiv_ID))
+		print("Error: The paper [%s] cannot be found on the preprint server." % (arxiv_ID))
 		os.abort()
 	version_max = 1
 	while version_max < 100:
@@ -237,7 +237,7 @@ def download_from_arxiv(arxiv_ID,version):
 		url="https://arxiv.org/src/"+arxiv_ID+"v"+str(version)
 		download_from_url(url,filepath)
 	else:
-		print("Download of source files for "+arxiv_ID+"v"+str(version)+" not necessary.")
+		print("\tDownload of source files for [%sv%i] not necessary." % (arxiv_ID, version))
 
 #Unpack the archived files to a temporary folder
 def unpack_source_files(arxiv_ID,version,path_destination):
@@ -272,10 +272,10 @@ def identify_master_tex_file(path,arxiv_ID):
 		master_file = file + ".tex"
 		os.rename( join(path, file), join(path, master_file))
 	if master_file == None:
-		print("Error in identify_master_tex_file(): Among the ",len(tex_files)," tex files, no master file could be identified.")
+		print("Error in identify_master_tex_file(): Among the %i tex files, no master file could be identified." % len(tex_files))
 		os.abort()
 	else:
-		print("\t",arxiv_ID+path[-4:-1],": ",master_file)
+		print("\t%sv%s:\t%s" % (arxiv_ID, path.split('v')[-1], master_file))
 		return master_file
 
 def identify_bbl_file(path, arxiv_ID):
@@ -287,15 +287,15 @@ def identify_bbl_file(path, arxiv_ID):
 	# Possibility b: No .bbl file exists.
 	else:
 		bbl_file = None
-
-	print("\t",arxiv_ID+path[-4:-1],": ",bbl_file)
+	print("\t%sv%s:\t%s" % (arxiv_ID, path.split('v')[-1], bbl_file))
+	# print("\t",arxiv_ID+path[-4:-1],": ",bbl_file)
 	return bbl_file
 
 def print_title(ID,v1,v2):
 	asci_title = "                                    __  ___       \n  ___ ___  _ __ ___  _ __   __ _ _ _\ \/ (_)_   __\n / __/ _ \| '_ ` _ \| '_ \ / _` | '__\  /| \ \ / /\n| (_| (_) | | | | | | |_) | (_| | |  /  \| |\ V / \n \___\___/|_| |_| |_| .__/ \__,_|_| /_/\_\_| \_/  \n                    |_|                           \n"
 	print(asci_title)
-	print("Version ",version,", developed by",author,"("+year+")")
-	print("\nCompare [%s]: v%i vs v%i\n"%(ID,v1,v2))
+	print("Version %s, developed by %s (%s)" % (version, author, year))
+	print("\nCompare [%s]: v%i vs v%i\n" % (ID,v1,v2))
 
 if __name__ == "__main__":
 	arxiv_ID = str(sys.argv[1])
