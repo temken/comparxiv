@@ -9,6 +9,8 @@ import requests
 
 from sys import platform
 from tqdm import tqdm
+from os.path import join
+
 
 version = '0.1.7'
 author = 'Timon Emken'
@@ -31,9 +33,12 @@ def compare_preprints(arxiv_ID, version_a, version_b,keep_temp,show_latex_output
 	if os.path.exists(temp_folder) == False:
 		os.mkdir(temp_folder)
 
-	temp_folder_a = os.path.join(".", temp_folder, 'temp_' + ID_a)
-	temp_folder_b = os.path.join(".", temp_folder, 'temp_' + ID_b)
+	temp_folder_a = join(temp_folder, 'temp_' + ID_a)
+	temp_folder_b = join(temp_folder, 'temp_' + ID_b)
 	diff_file = os.path.split(arxiv_ID)[-1]+"_v"+str(version_a)+"v"+str(version_b)
+	diff_file_tex = diff_file + ".tex"
+	diff_file_bbl = diff_file + ".bbl"
+	diff_file_pdf = diff_file + ".pdf"
 
 	print_paper_information(arxiv_ID,version_a,version_b)
 
@@ -65,7 +70,7 @@ def compare_preprints(arxiv_ID, version_a, version_b,keep_temp,show_latex_output
 	if dont_compare_equations:
 		latexdiff_command_tex += "--math-markup=0 "
 	
-	latexdiff_command_tex += os.path.join(".", temp_folder_a, master_file_a) + " " + os.path.join(".", temp_folder_b,master_file_b) + ">" + os.path.join(".",temp_folder_b,diff_file+".tex")
+	latexdiff_command_tex += join(temp_folder_a, master_file_a) + " " + join(temp_folder_b,master_file_b) + ">" + join(temp_folder_b, diff_file_tex)
 
 	os.system(latexdiff_command_tex)
 
@@ -76,35 +81,35 @@ def compare_preprints(arxiv_ID, version_a, version_b,keep_temp,show_latex_output
 		if show_latex_output == False:
 			latexdiff_command_bbl += "--ignore-warnings "
 		
-		latexdiff_command_bbl += os.path.join(temp_folder_a, bbl_file_a) + " " + os.path.join(temp_folder_b, bbl_file_b) + ">" + os.path.join(".", temp_folder_b, diff_file+".bbl")
+		latexdiff_command_bbl += join(temp_folder_a, bbl_file_a) + " " + join(temp_folder_b, bbl_file_b) + ">" + join(temp_folder_b, diff_file_bbl)
 		os.system(latexdiff_command_bbl)
 
 	#4. Run pdflatex
 	print("\n4.) Generate a pdf with pdflatex.")
-	Generate_PDF(diff_file,temp_folder_b,show_latex_output)
+	Generate_PDF(diff_file_tex,temp_folder_b,show_latex_output)
 
 	#5. If unsuccessful, try again with a copy of the version b .bbl file.
-	if bbl_file_b != None and os.path.isfile( os.path.join(temp_folder_b,diff_file+".pdf") ) == False:
+	if bbl_file_b != None and os.path.isfile( join(temp_folder_b,diff_file_pdf) ) == False:
 		print("\tWarning: No pdf could be generated. Copy the .bbl file of version b and try again.")
-		shutil.copyfile( os.path.join(temp_folder_b, bbl_file_b), os.path.join(temp_folder_b, diff_file+".bbl"))
-		Generate_PDF(diff_file,temp_folder_b,show_latex_output)
+		shutil.copyfile( join(temp_folder_b, bbl_file_b), join(temp_folder_b, diff_file_bbl))
+		Generate_PDF(diff_file_tex,temp_folder_b,show_latex_output)
 	
 	success = False;
-	if os.path.isfile( os.path.join(temp_folder_b, diff_file+".pdf")):
+	if os.path.isfile( join(temp_folder_b, diff_file_pdf)):
 		success = True
 	#6. Compare figures
 	# todo
 
 	#7. If successful copy the .pdf.
 	if success:
-		os.rename( os.path.join(".",temp_folder_b,diff_file+".pdf"), os.path.join(".",diff_file+".pdf") )
+		os.rename( join(temp_folder_b, diff_file_pdf), join(diff_file_pdf) )
 		if dont_open_pdf == False:
 			if platform == "linux" or platform == "linux2":
-				os.system("xdg-open "+diff_file+".pdf")
+				os.system("xdg-open "+diff_file_pdf)
 			elif platform == "darwin":
-				os.system("open "+diff_file+".pdf")
+				os.system("open "+diff_file_pdf)
 			elif platform == "win32":
-				os.startfile(diff_file+".pdf")
+				os.startfile(diff_file_pdf)
 		print("\nSuccess!")
 
 	else:
@@ -185,10 +190,10 @@ def latest_available_version(arxiv_ID):
 			break
 	return version_max
 
-def Generate_PDF(file, folder, show_latex_output):
+def Generate_PDF(tex_file, folder, show_latex_output):
 	owd = os.getcwd()
 	os.chdir(folder)
-	pdflatex_command = "pdflatex -interaction=nonstopmode "+file+".tex"
+	pdflatex_command = "pdflatex -interaction=nonstopmode " + tex_file
 	if show_latex_output == False:
 		if platform == "win32":
 			pdflatex_command += " > nul 2>&1"
@@ -225,9 +230,9 @@ def download_from_url(url, destination):
 def download_from_arxiv(arxiv_ID,version):
 	#Check if old or new arxiv ID
 	if "/" in arxiv_ID:
-		filepath = os.path.join(".",temp_folder,os.path.split(arxiv_ID)[-1]+"v"+str(version))
+		filepath = join(temp_folder, os.path.split(arxiv_ID)[-1]+"v"+str(version))
 	else:
-		filepath = os.path.join(".", temp_folder, arxiv_ID+"v"+str(version))
+		filepath = join(temp_folder, arxiv_ID+"v"+str(version))
 	if os.path.isfile(filepath) == False:
 		url="https://arxiv.org/src/"+arxiv_ID+"v"+str(version)
 		download_from_url(url,filepath)
@@ -236,12 +241,12 @@ def download_from_arxiv(arxiv_ID,version):
 
 #Unpack the archived files to a temporary folder
 def unpack_source_files(arxiv_ID,version,path_destination):
-	version_ID = arxiv_ID+"v"+str(version)
+	version_ID = arxiv_ID + "v" + str(version)
 	#Check if old or new arxiv ID
 	if "/" in arxiv_ID:
-		path_source = os.path.join(".", temp_folder, os.path.split(version_ID)[-1])
+		path_source = join(temp_folder, os.path.split(version_ID)[-1])
 	else:
-		path_source = os.path.join(".", temp_folder, version_ID)
+		path_source = join(temp_folder, version_ID)
 	# Create folder for temporary files
 	if os.path.isfile(path_source) and os.path.exists(path_destination) == False:
 		os.makedirs(path_destination)
@@ -257,15 +262,15 @@ def identify_master_tex_file(path,arxiv_ID):
 			tex_files.append(file)
 	if len(tex_files) > 1:
 		for file in tex_files:
-			with open( os.path.join(path,file) ) as f:
+			with open( join(path,file) ) as f:
 				if 'begin{document}' in f.read():
 					master_file = file
 					break
 	elif len(tex_files) == 1:
 		master_file = tex_files[0]
 	elif len(tex_files) == 0 and len(files)==1:
-		os.rename( os.path.join(path, file), os.path.join(path, file + ".tex"))
 		master_file = file + ".tex"
+		os.rename( join(path, file), join(path, master_file))
 	if master_file == None:
 		print("Error in identify_master_tex_file(): Among the ",len(tex_files)," tex files, no master file could be identified.")
 		os.abort()
