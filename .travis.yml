@@ -32,7 +32,7 @@ cache:
 script:
   - which pdflatex
   - which latexdiff
-  - pytest --cov=comparxiv comparxiv/tests
+  - pytest --cov=comparxiv tests
 
 after_success:
   - coveralls

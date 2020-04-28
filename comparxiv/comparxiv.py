@@ -288,7 +288,6 @@ def identify_bbl_file(path, arxiv_ID):
 	else:
 		bbl_file = None
 	print("\t%sv%s:\t%s" % (arxiv_ID, path.split('v')[-1], bbl_file))
-	# print("\t",arxiv_ID+path[-4:-1],": ",bbl_file)
 	return bbl_file
 
 def print_title(ID,v1,v2):
