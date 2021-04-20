@@ -5,7 +5,7 @@ def readme():
         return f.read()
 
 setup(name='comparxiv',
-      version='0.1.7',
+      version='0.1.8',
       description='Compare two versions of an arXiv preprint with latexdiff.',
       long_description = readme(),
       long_description_content_type='text/markdown',
