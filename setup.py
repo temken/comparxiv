@@ -19,7 +19,7 @@ setup(name='comparxiv',
           'tqdm',
           'argparse',
           'requests',
-          'arxiv'
+          'arxiv==0.5.3'
       ],
       entry_points = {
         'console_scripts': ['comparxiv=comparxiv.command_line:main'],
