@@ -11,7 +11,7 @@ def test_comparxiv(ID):
 	show_latex_output = False
 	dont_open_pdf = True
 	dont_compare_equations = False
-	assert compare_preprints(ID, 1, 2, keep_temp_files, show_latex_output, dont_open_pdf, dont_compare_equations)
+	assert compare_preprints(ID, 1, 2, keep_temp_files, show_latex_output, dont_open_pdf, dont_compare_equations), "comparison unsuccessful"
 
 @pytest.mark.parametrize("cmd, pdf",[
 	("comparxiv --dont_open_pdf 1907.06674 1 2","1907.06674_v1v2.pdf"),
@@ -22,5 +22,5 @@ def test_comparxiv(ID):
 ])
 def test_command_line(cmd, pdf):
 	os.system(cmd)
-	assert os.path.isfile(pdf)
+	assert os.path.isfile(pdf), "missing expected PDF output: {}".format(pdf)
 
