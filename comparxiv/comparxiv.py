@@ -22,12 +22,8 @@ def compare_preprints(arxiv_ID, version_a, version_b,keep_temp,show_latex_output
 	print_title(arxiv_ID, version_a, version_b)
 
 	#Check if old or new arxiv ID
-	if "/" in arxiv_ID:
-		ID_a = os.path.split(arxiv_ID)[-1]+"v"+str(version_a)
-		ID_b = os.path.split(arxiv_ID)[-1]+"v"+str(version_b)
-	else:
-		ID_a = arxiv_ID+"v"+str(version_a)
-		ID_b = arxiv_ID+"v"+str(version_b)
+	ID_a = arxiv_ID+"v"+str(version_a)
+	ID_b = arxiv_ID+"v"+str(version_b)
 
 	#Create folder for temporary files
 	if os.path.exists(temp_folder) == False:
@@ -124,20 +120,19 @@ def compare_preprints(arxiv_ID, version_a, version_b,keep_temp,show_latex_output
 	return success
 
 def print_paper_information(arxiv_ID,vA,vB):
-	papers = arxiv.query(query="",
-	    id_list=[arxiv_ID + "v" + str(vA),arxiv_ID + "v" + str(vB)],
-	    max_results=2)
+	to_id = lambda v: '{}v{}'.format(arxiv_ID, str(v))
+	papers = list(arxiv.Search(id_list=[to_id(vA),to_id(vB)],max_results=2).results())
 	if papers[0].title != papers[1].title:
 		print("New title:\t%s" % papers[1].title)
 		print("Old title:\t%s" % papers[0].title)
 	else:
 		print("Title:\t\t%s" % papers[1].title)
 	if len(papers[1].authors) == 1:
-		print("Author:\t\t%s\n" % papers[1].authors[0])
+		print("Author:\t\t%s\n" % papers[1].authors[0].name)
 	elif len(papers[1].authors) > 6:
-		print("Authors:\t%s et al.\n" % papers[1].authors[0])
+		print("Authors:\t%s et al.\n" % papers[1].authors[0].name)
 	else:
-		print("Authors:\t",", " . join(papers[1].authors),"\n")
+		print("Authors:\t",", " . join([a.name for a in papers[1].authors]),"\n")
 
 def check_arguments(arxiv_ID,vA,vB):
 	#1. Check for identical versions
@@ -173,21 +168,18 @@ def check_arguments(arxiv_ID,vA,vB):
 		os.abort()	
 
 def latest_available_version(arxiv_ID):
-	papers= arxiv.query(query="",
-		id_list=[arxiv_ID],
-		max_results=1)
+	papers = list(arxiv.Search(id_list=[arxiv_ID],max_results=1).results())
 	if len(papers) == 0:
 		print("Error: The paper [%s] cannot be found on the preprint server." % (arxiv_ID))
 		os.abort()
 	version_max = 1
 	while version_max < 100:
-		paper = arxiv.query(query="",
-			id_list=[arxiv_ID+"v"+str(version_max + 1)],
-			max_results=1)
-		if len(paper) > 0 and paper[0].id.split("v")[-1] == str(version_max + 1) :
-			version_max += 1
-		else:
+		try:
+			papers = list(arxiv.Search(id_list=[arxiv_ID+"v"+str(version_max + 1)], max_results=1).results())
+		except AttributeError:
+			# NOTE(lukasschwab): see lukasschwab/arxiv.py#80.
 			break
+		version_max += 1
 	return version_max
 
 def Generate_PDF(tex_file, folder, show_latex_output):
