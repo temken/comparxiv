@@ -121,7 +121,7 @@ def compare_preprints(arxiv_ID, version_a, version_b,keep_temp,show_latex_output
 
 def print_paper_information(arxiv_ID,vA,vB):
 	to_id = lambda v: '{}v{}'.format(arxiv_ID, str(v))
-	papers = list(arxiv.Search(id_list=[to_id(vA),to_id(vB)],max_results=2).results())
+	papers = list_papers([to_id(vA),to_id(vB)])
 	if papers[0].title != papers[1].title:
 		print("New title:\t%s" % papers[1].title)
 		print("Old title:\t%s" % papers[0].title)
@@ -168,16 +168,14 @@ def check_arguments(arxiv_ID,vA,vB):
 		os.abort()	
 
 def latest_available_version(arxiv_ID):
-	papers = list(arxiv.Search(id_list=[arxiv_ID],max_results=1).results())
+	papers = list_papers([arxiv_ID])
 	if len(papers) == 0:
 		print("Error: The paper [%s] cannot be found on the preprint server." % (arxiv_ID))
 		os.abort()
 	version_max = 1
 	while version_max < 100:
-		try:
-			papers = list(arxiv.Search(id_list=[arxiv_ID+"v"+str(version_max + 1)], max_results=1).results())
-		except AttributeError:
-			# NOTE(lukasschwab): see lukasschwab/arxiv.py#80.
+		papers = list_papers([arxiv_ID+"v"+str(version_max + 1)])
+		if len(papers) == 0:
 			break
 		version_max += 1
 	return version_max
@@ -195,6 +193,12 @@ def Generate_PDF(tex_file, folder, show_latex_output):
 	os.system(pdflatex_command)
 	os.chdir(owd)
 
+def list_papers(ids):
+	try:
+		return list(arxiv.Search(id_list=ids).results())
+	except AttributeError:
+		# NOTE(lukasschwab): see lukasschwab/arxiv.py#80.
+		return []
 
 #Download the files from the preprint server, if it hasn't been done before.
 def download_from_url(url, destination):
