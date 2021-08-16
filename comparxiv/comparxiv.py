@@ -172,13 +172,7 @@ def latest_available_version(arxiv_ID):
 	if len(papers) == 0:
 		print("Error: The paper [%s] cannot be found on the preprint server." % (arxiv_ID))
 		os.abort()
-	version_max = 1
-	while version_max < 100:
-		papers = list_papers([arxiv_ID+"v"+str(version_max + 1)])
-		if len(papers) == 0:
-			break
-		version_max += 1
-	return version_max
+	return int(papers[0].get_short_id().split("v")[-1])
 
 def Generate_PDF(tex_file, folder, show_latex_output):
 	owd = os.getcwd()
