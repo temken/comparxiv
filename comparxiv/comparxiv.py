@@ -12,7 +12,7 @@ from tqdm import tqdm
 from os.path import join
 
 
-version = '0.1.8'
+version = '0.1.9'
 author = 'Timon Emken'
 year = '2020'
 
