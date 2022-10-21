@@ -1,6 +1,6 @@
 
-[![Build Status](https://travis-ci.com/temken/comparxiv.svg?branch=master)](https://travis-ci.com/temken/comparxiv)
-[![Coverage Status](https://coveralls.io/repos/github/temken/comparxiv/badge.svg?branch=master)](https://coveralls.io/github/temken/comparxiv?branch=master)
+[![Build Status](https://travis-ci.com/temken/comparxiv.svg?branch=main)](https://travis-ci.com/temken/comparxiv)
+[![Coverage Status](https://coveralls.io/repos/github/temken/comparxiv/badge.svg?branch=main)](https://coveralls.io/github/temken/comparxiv?branch=main)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
 # comparxiv 

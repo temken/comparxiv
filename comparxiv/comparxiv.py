@@ -12,7 +12,7 @@ from tqdm import tqdm
 from os.path import join
 
 
-version = '0.1.7'
+version = '0.1.8'
 author = 'Timon Emken'
 year = '2020'
 
@@ -281,10 +281,10 @@ def identify_bbl_file(path, arxiv_ID):
 	return bbl_file
 
 def print_title(ID,v1,v2):
-	asci_title = "                                    __  ___       \n  ___ ___  _ __ ___  _ __   __ _ _ _\ \/ (_)_   __\n / __/ _ \| '_ ` _ \| '_ \ / _` | '__\  /| \ \ / /\n| (_| (_) | | | | | | |_) | (_| | |  /  \| |\ V / \n \___\___/|_| |_| |_| .__/ \__,_|_| /_/\_\_| \_/  \n                    |_|                           \n"
+	asci_title = "                                    __  ___       \n  ___ ___  _ __ ___  _ __   __ _ _ _\ \/ (_)_   __\n / __/ _ \| '_ ` _ \| '_ \ / _` | '__\  /| \ \ / /\n| (_| (_) | | | | | | |_) | (_| | |  /  \| |\ V / \n \___\___/|_| |_| |_| .__/ \__,_|_| /_/\_\_| \_/  \n                    |_|                           "
 	print(asci_title)
-	print("Version %s, developed by %s (%s)" % (version, author, year))
-	print("\nCompare [%s]: v%i vs v%i\n" % (ID,v1,v2))
+	print("Version %s                by %s (%s)" % (version, author, year))
+	print("\nCompare [arXiv:%s]: v%i vs v%i\n" % (ID,v1,v2))
 
 if __name__ == "__main__":
 	arxiv_ID = str(sys.argv[1])
