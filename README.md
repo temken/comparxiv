@@ -5,6 +5,8 @@
 
 # comparxiv 
 
+[![Downloads](https://pepy.tech/badge/comparxiv)](https://pepy.tech/project/comparxiv)
+
 A wrapper of [**latexdiff**](https://ctan.org/pkg/latexdiff?lang=en) to compare two version of an [arXiv](https://arxiv.org) preprint with a single command.
 
 <img src="https://user-images.githubusercontent.com/29034913/80139519-e28a4800-85a6-11ea-92f4-1210c1070376.png" width="750">
